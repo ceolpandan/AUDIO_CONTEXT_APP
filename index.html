@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mini Digitakt Demo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="drum-machine">
+      <header class="top-bar">
+        <button id="play-btn">Play</button>
+        <button id="stop-btn">Stop</button>
+        <label>
+          BPM
+          <input id="bpm" type="range" min="60" max="180" value="120" />
+        </label>
+      </header>
+
+      <main class="tracks">
+        <!-- 8 tracks, 16 steps each; you can generate via JS later,
+           but here’s one as an example: -->
+        <section class="track" data-track="0">
+          <h2>Track 1</h2>
+          <div class="knobs">
+            <label>
+              Vol
+              <input
+                class="knob volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.8"
+              />
+            </label>
+            <label>
+              Tone
+              <input
+                class="knob tone"
+                type="range"
+                min="100"
+                max="8000"
+                step="100"
+                value="2000"
+              />
+            </label>
+          </div>
+          <div class="steps">
+            <!-- 16 buttons -->
+            <button class="step" data-step="0"></button>
+            <button class="step" data-step="1"></button>
+            <!-- … up to 15 -->
+          </div>
+        </section>
+
+        <!-- Repeat section for tracks 2–8 or generate them in JS -->
+      </main>
+    </div>
+
+    <!-- This loads your JS engine -->
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
