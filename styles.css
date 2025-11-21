@@ -1,33 +1,18 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: radial-gradient(circle at top, #222 0, #111 40%, #000 100%);
-  color: #eee;
-}
-
-/* DRUM MACHINE LAYOUT */
 .drum-machine {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
+  padding: var(--space-lg);
+  gap: var(--space-lg);
+}
+.drum-machine {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg);
+  gap: var(--space-lg);
 }
 
-/* TOP BAR (TRANSPORT) */
 .top-bar {
   display: flex;
   flex-wrap: wrap;
@@ -35,83 +20,104 @@ body {
   justify-content: center;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #222, #1a1a1a);
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, var(--panel), #1a1a1a);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-soft);
 }
-
 .top-bar button {
   min-width: 80px;
   padding: 0.5rem 1rem;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: none;
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  background: #0aa06f;
+  background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(10, 160, 111, 0.6);
+  box-shadow: var(--shadow-strong);
   cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s ease;
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.12s;
 }
-
 .top-bar button:active {
   transform: translateY(1px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
   filter: brightness(0.95);
 }
-
 .top-bar button:last-of-type {
-  background: #b50b3b;
+  background: var(--danger);
   box-shadow: 0 4px 12px rgba(181, 11, 59, 0.6);
 }
-
-.top-bar button:last-of-type:active {
-  filter: brightness(0.9);
-}
-
 .top-bar label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #aaa;
+  color: var(--muted);
 }
-
 .top-bar label input[type="range"] {
   width: 150px;
 }
 
-/* TRACK GRID */
+/* Sequencer controls (single-track view) */
 .tracks {
   display: grid;
   grid-auto-rows: minmax(0, 1fr);
+  gap: var(--space-lg);
+  padding-bottom: var(--space-lg);
+}
+.sequencer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.nav-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--fg);
+  font-size: 1.2rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.track-screen {
+  min-width: 520px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.track-info {
+  background: linear-gradient(135deg, #111, #1a1a1a);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  color: var(--fg);
+  font-size: var(--text-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
-  padding-bottom: 1rem;
+}
+.track-info .meta {
+  color: #9fbfb1;
+  font-weight: 600;
 }
 
-@media (min-width: 768px) {
-  .tracks {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-/* TRACK CARD */
+/* Track card / components (kept compatible with existing class names) */
 .track {
-  background: #222;
-  border-radius: 1rem;
+  background: var(--panel);
+  border-radius: var(--r-md);
   padding: 0.9rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   position: relative;
   overflow: hidden;
 }
-
 .track::before {
   content: "";
   position: absolute;
@@ -123,21 +129,17 @@ body {
   );
   pointer-events: none;
 }
-
 .track h2 {
   margin: 0 0 0.25rem;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #aaa;
+  color: var(--muted);
 }
-
-/* KNOBS ROW */
 .track .knobs {
   display: flex;
   gap: 0.5rem;
 }
-
 .track .knobs label {
   flex: 1;
   display: flex;
@@ -146,67 +148,56 @@ body {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #aaa;
+  color: var(--muted);
 }
-
 .track .knobs label .knob {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 24px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: #000;
   outline: none;
   padding: 0;
   margin: 0;
   box-shadow: inset 0 0 0 1px #333;
 }
-
-/* WebKit range thumb */
 .track .knobs label .knob::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #0aa06f;
+  background: var(--accent);
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
   margin-top: 2px;
   cursor: pointer;
 }
-
-/* Firefox range thumb */
 .track .knobs label .knob::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #0aa06f;
+  background: var(--accent);
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
   cursor: pointer;
 }
-
-/* Firefox track */
 .track .knobs label .knob::-moz-range-track {
   background: #000;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
-
-/* STEPS GRID */
 .track .steps {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 0.25rem;
   margin-top: 0.25rem;
 }
-
 @media (max-width: 480px) {
   .track .steps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-
 .track .steps .step {
   position: relative;
   padding: 0.75rem 0;
@@ -215,9 +206,8 @@ body {
   background: #333;
   cursor: pointer;
   box-shadow: inset 0 0 0 1px #444;
-  transition: background 0.12s ease, transform 0.06s ease, box-shadow 0.1s ease;
+  transition: background 0.12s, transform 0.06s, box-shadow 0.1s;
 }
-
 .track .steps .step::after {
   content: "";
   position: absolute;
@@ -225,34 +215,27 @@ body {
   border-radius: inherit;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
-
 .track .steps .step:active {
   transform: translateY(1px);
   box-shadow: inset 0 0 0 1px #444, 0 1px 2px rgba(0, 0, 0, 0.6);
 }
-
 .track .steps .step.active {
-  background: #0aa06f;
+  background: var(--accent);
   box-shadow: 0 0 12px rgba(10, 160, 111, 0.9),
     inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
-
 .track .steps .step.active::after {
   border-color: rgba(255, 255, 255, 0.2);
 }
-
-/* PLAYHEAD HIGHLIGHT (optional) */
 .step--playhead {
   outline: 2px solid #fff;
   outline-offset: -3px;
 }
-
-/* DEBUG TEXT (optional) */
 #debug {
   position: fixed;
   bottom: 0.5rem;
   right: 0.5rem;
   font-size: 0.7rem;
-  color: #aaa;
+  color: var(--muted);
   opacity: 0.7;
 }
