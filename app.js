@@ -9,6 +9,7 @@ import {
   setBpm,
 } from "./src/engine.js";
 import { init as uiInit, updateMixerUI, startUI, stopUI } from "./src/ui.js";
+import { STEPS } from "./src/config/index.js";
 
 let playbackStartTime = null;
 
@@ -47,7 +48,7 @@ async function boot() {
     });
 
     // Closed hats: steady 8th notes (every 2 steps)
-    for (let s = 0; s < 16; s += 2) {
+    for (let s = 0; s < STEPS; s += 2) {
       if (tracks[2] && tracks[2].pattern[s]) tracks[2].pattern[s].trig = true;
     }
 

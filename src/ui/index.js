@@ -1,13 +1,12 @@
 import {
   audioCtx,
   tracks,
-  STEPS,
-  TRACK_COUNT,
   updateMixerGains,
   setBpm,
   getBpm,
   getAnalyser,
 } from "../engine.js";
+import { STEPS, TRACK_COUNT } from "../config/index.js";
 
 let uiRaf = null;
 let lastUiStep = -1;

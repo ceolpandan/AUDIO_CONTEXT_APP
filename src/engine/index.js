@@ -1,3 +1,16 @@
+// Application-level config (shared constants)
+import {
+  DEFAULT_BPM,
+  STEPS,
+  TRACK_COUNT,
+  FFT_SIZE,
+  LOOKAHEAD,
+  STEPS_PER_BEAT,
+  DEFAULT_FILTER_FREQ,
+  DEFAULT_FILTER_Q,
+  DEFAULT_VOLUME,
+} from "../config/index.js";
+
 // Audio engine: audio context, Track, scheduling, and helper APIs
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -5,7 +18,8 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const masterGain = audioCtx.createGain();
 masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
 const analyser = audioCtx.createAnalyser();
-analyser.fftSize = 2048;
+// FFT size pulled from shared config
+analyser.fftSize = FFT_SIZE;
 masterGain.connect(analyser);
 analyser.connect(audioCtx.destination);
 
@@ -16,15 +30,15 @@ class Track {
     this.index = index;
     this.buffer = null;
 
-    this.pattern = Array(16)
+    this.pattern = Array(STEPS)
       .fill(null)
       .map(() => ({
         trig: false,
         locks: {},
       }));
 
-    this.volume = 0.8;
-    this.filterFreq = 2000;
+    this.volume = DEFAULT_VOLUME;
+    this.filterFreq = DEFAULT_FILTER_FREQ;
     // filter type and resonance (Q)
     this.filterType = "lowpass";
     this.filterQ = 1;
@@ -107,20 +121,17 @@ class Track {
 }
 
 // Sequencer state
-let bpm = 120;
-const STEPS = 16;
-const TRACK_COUNT = 8;
+let bpm = DEFAULT_BPM;
 
 function stepDuration(localBpm = bpm) {
   const beatsPerSecond = localBpm / 60;
-  const stepsPerBeat = 4;
-  return 1 / (beatsPerSecond * stepsPerBeat);
+  return 1 / (beatsPerSecond * STEPS_PER_BEAT);
 }
 
 let isPlaying = false;
 let currentStep = 0;
 let nextEventTime = 0;
-const lookahead = 0.1;
+const lookahead = LOOKAHEAD;
 
 let tracks = [];
 
