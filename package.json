@@ -1,0 +1,13 @@
+{
+  "name": "audio-context-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server.js",
+    "start": "node dev-server.js"
+  },
+  "description": "Tiny dev server for live-reload during development",
+  "engines": {
+    "node": ">=12"
+  }
+}
