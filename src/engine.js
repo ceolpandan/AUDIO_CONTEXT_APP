@@ -20,7 +20,9 @@ class Track {
 
     this.gainNode = context.createGain();
     this.gainNode.connect(context.destination);
-    this.gainNode.gain.setValueAtTime(1, this.context.currentTime);
+    // Channel fader level (0..1) — separate from per-hit envelope volume
+    this.level = 1;
+    this.gainNode.gain.setValueAtTime(this.level, this.context.currentTime);
     this.muted = false;
     this.solo = false;
   }
@@ -159,11 +161,34 @@ function updateMixerGains() {
     const val = enabled ? 1 : 0;
     try {
       t.gainNode.gain.cancelScheduledValues(now);
-      t.gainNode.gain.setValueAtTime(val, now);
+      // multiply channel level by mute/solo state
+      t.gainNode.gain.setValueAtTime(t.level * val, now);
     } catch (e) {
       // ignore
     }
   });
+}
+
+function setTrackLevel(index, value, ramp = 0.03) {
+  const t = tracks[index];
+  if (!t) return;
+  const now = audioCtx.currentTime;
+  try {
+    t.gainNode.gain.cancelScheduledValues(now);
+    // ensure we start from the current scheduled value
+    t.gainNode.gain.setValueAtTime(t.gainNode.gain.value, now);
+    t.gainNode.gain.linearRampToValueAtTime(
+      value * (t.muted || t.solo ? (t.solo ? 1 : 0) : 1),
+      now + ramp
+    );
+  } catch (e) {
+    try {
+      t.gainNode.gain.setValueAtTime(value, now);
+    } catch (e2) {
+      // ignore
+    }
+  }
+  t.level = value;
 }
 
 function setBpm(v) {
@@ -185,6 +210,7 @@ export {
   createTracksFromUrls,
   tracks,
   updateMixerGains,
+  setTrackLevel,
   setBpm,
   getBpm,
 };

@@ -178,6 +178,39 @@ function renderMixer() {
     controls.appendChild(mute);
     controls.appendChild(solo);
 
+    // per-channel fader control
+    const faderWrap = document.createElement("div");
+    faderWrap.className = "fader-wrap";
+    const fader = document.createElement("input");
+    fader.type = "range";
+    fader.min = "0";
+    fader.max = "1";
+    fader.step = "0.01";
+    const currentLevel =
+      typeof t.level === "number" ? t.level : t.gainNode?.gain?.value ?? 1;
+    fader.value = String(currentLevel);
+    fader.title = "Level";
+    faderWrap.appendChild(fader);
+    // bind fader to track gain with smoothing
+    fader.addEventListener("input", () => {
+      const v = Number(fader.value);
+      const now = audioCtx.currentTime;
+      try {
+        t.gainNode.gain.cancelScheduledValues(now);
+        t.gainNode.gain.setValueAtTime(t.gainNode.gain.value, now);
+        const soloActive = tracks.some((x) => x.solo);
+        const enabled = soloActive ? t.solo : !t.muted;
+        const effective = v * (enabled ? 1 : 0);
+        t.gainNode.gain.linearRampToValueAtTime(effective, now + 0.03);
+      } catch (e) {
+        try {
+          t.gainNode.gain.setValueAtTime(v, now);
+        } catch (e2) {}
+      }
+      t.level = v;
+    });
+    controls.appendChild(faderWrap);
+
     ch.appendChild(label);
     ch.appendChild(controls);
 
@@ -188,8 +221,17 @@ function renderMixer() {
           e.target.classList.contains("solo"))
       )
         return;
-      selectedTrack = i;
-      renderTrackUI(selectedTrack);
+      // Toggle sequencer visibility when clicking the same channel;
+      // otherwise select and show the sequencer for the clicked channel.
+      const trackScreen = document.querySelector(".track-screen");
+      const wasSelected = selectedTrack === i;
+      if (wasSelected && trackScreen) {
+        trackScreen.classList.toggle("collapsed");
+      } else {
+        if (trackScreen) trackScreen.classList.remove("collapsed");
+        selectedTrack = i;
+        renderTrackUI(selectedTrack);
+      }
       updateMixerUI();
     });
 
@@ -210,6 +252,14 @@ function updateMixerUI() {
     const soloBtn = el.querySelector(".solo");
     if (muteBtn) muteBtn.classList.toggle("active", !!track.muted);
     if (soloBtn) soloBtn.classList.toggle("active", !!track.solo);
+    const faderEl = el.querySelector(".fader-wrap input");
+    if (faderEl) {
+      const val =
+        typeof track.level === "number"
+          ? track.level
+          : track.gainNode?.gain?.value ?? 1;
+      faderEl.value = String(val);
+    }
     el.classList.toggle("active", idx === selectedTrack);
   });
 }

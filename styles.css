@@ -239,3 +239,99 @@
   color: var(--muted);
   opacity: 0.7;
 }
+
+/* Mixer styles (uses design tokens) */
+.mixer {
+  margin-top: var(--space-lg);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), transparent);
+  padding: var(--space-md);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-soft);
+}
+.mixer .track-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.mixer-placeholder {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: var(--space-sm) 0;
+}
+
+.mixer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  gap: var(--space-sm);
+}
+
+.channel {
+  background: var(--panel);
+  border-radius: var(--r-sm);
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.12s, border-color 0.12s;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.channel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+}
+.channel .label {
+  font-size: 0.8rem;
+  color: var(--fg);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.channel .controls {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+.channel .mute,
+.channel .solo {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.channel .mute.active,
+.channel .solo.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(10, 160, 111, 0.3);
+}
+
+.fader-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.fader-wrap input[type="range"] {
+  width: 100%;
+}
+
+.channel.active {
+  border-color: var(--channel-accent, var(--accent));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(10, 160, 111, 0.08);
+}
+
+/* Collapsed sequencer: hides the track-screen visually but keeps layout stable */
+.track-screen.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 220ms ease, opacity 180ms linear;
+}
