@@ -457,6 +457,19 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(10, 160, 111, 0.08);
 }
 
+/* Flash when a track triggers */
+.channel.channel--hit {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  box-shadow: 0 10px 30px rgba(240, 240, 240, 0.5) inset,
+    0 6px 18px rgba(0, 0, 0, 0.45);
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+
 /* Collapsed sequencer: hides the track-screen visually but keeps layout stable */
 .track-screen.collapsed {
   max-height: 0;

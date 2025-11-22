@@ -17,6 +17,20 @@ let scopeCanvas = null;
 let scopeCtx = null;
 let analyserNode = null;
 let scopeData = null;
+// map to hold pending flash timeouts per channel
+const _flashTimeouts = new Map();
+
+// listen for scheduled trigger events from the engine
+if (typeof document !== "undefined") {
+  document.addEventListener("track-trigger", (e) => {
+    try {
+      const idx = e?.detail?.trackIndex;
+      if (typeof idx === "number") flashChannel(idx);
+    } catch (err) {
+      /* ignore */
+    }
+  });
+}
 
 function startUI(playbackStartTimeRef) {
   if (uiRaf) cancelAnimationFrame(uiRaf);
@@ -284,6 +298,25 @@ function renderMixer() {
 
   mixerRoot.appendChild(grid);
   updateMixerUI();
+}
+
+function flashChannel(index, ms = 160) {
+  const el = document.querySelector(
+    `.mixer-grid .channel[data-track="${index}"]`
+  );
+  if (!el) return;
+  // clear existing timeout
+  const prev = _flashTimeouts.get(index);
+  if (prev) {
+    clearTimeout(prev);
+    _flashTimeouts.delete(index);
+  }
+  el.classList.add("channel--hit");
+  const tid = setTimeout(() => {
+    el.classList.remove("channel--hit");
+    _flashTimeouts.delete(index);
+  }, ms);
+  _flashTimeouts.set(index, tid);
 }
 
 // Render filter controls for the selected track into the right-side filter panel

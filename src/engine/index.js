@@ -129,6 +129,19 @@ function scheduleStep(stepIndex, time) {
     const step = track.pattern[stepIndex];
     if (!step || !step.trig) return;
 
+    // notify UI that this track will trigger (UI can use this to flash mixers etc.)
+    try {
+      if (typeof document !== "undefined") {
+        document.dispatchEvent(
+          new CustomEvent("track-trigger", {
+            detail: { trackIndex: track.index, step: stepIndex, time },
+          })
+        );
+      }
+    } catch (e) {
+      // ignore (non-DOM environments)
+    }
+
     track.trigger(time, step.locks);
   });
 }
