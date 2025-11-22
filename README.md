@@ -127,3 +127,28 @@ If you want, I can also:
 - Run an automated smoke-test (start `dev-server.js` here and fetch `/`) and report any runtime errors.
 
 Tell me which follow-up you'd like next and I will implement it.
+
+**Publishing to GitHub**
+
+- **Check `.gitignore`:** Ensure large or private files (for example `samples/` if you prefer) are excluded. The repo already contains a basic `.gitignore` but review it before publishing.
+- **Create a new repository & push:** Run these commands from a Windows `cmd.exe` shell in the project root:
+
+  ```cmd
+  git init
+  git add .
+  git commit -m "Initial commit: Audio Context App"
+  git branch -M main
+  git remote add origin https://github.com/<your-username>/<repo-name>.git
+  git push -u origin main
+  ```
+
+- **Create the repo with GitHub CLI (optional):** If you have `gh` installed you can create and push in one step:
+
+  ```cmd
+  gh repo create <your-username>/<repo-name> --public --source=. --remote=origin --push
+  ```
+
+- **Large files / LFS:** If you plan to include large audio files, consider using `git lfs` or hosting samples elsewhere (CDN or cloud storage) and keeping lightweight references in the repo.
+- **CI & Badges:** The included GitHub Actions workflow is a minimal smoke test. After pushing, enable the workflow and add a badge to this README if you want build status visible.
+
+If you'd like, I can run through the exact `git` commands for you here (I won't run them without permission), or prepare a `publish.sh`/`publish.cmd` script you can run locally.
