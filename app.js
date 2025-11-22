@@ -11,10 +11,6 @@ import { init as uiInit, updateMixerUI, startUI, stopUI } from "./src/ui.js";
 
 let playbackStartTime = null;
 
-function getPlaybackStartTime() {
-  return playbackStartTime;
-}
-
 async function boot() {
   const sampleUrls = [
     "samples/kick1.wav",
