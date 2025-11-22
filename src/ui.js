@@ -302,7 +302,38 @@ function init(playbackStartTimeRefGetter) {
     });
   }
 
-  // Play/Stop are handled by the application bootstrap (app.js).
+  // Play/Stop are handled by the application bootstrap (app2.js).
+
+  // Keyboard shortcuts: keys 1..N select tracks (toggle if same key pressed twice)
+  window.addEventListener("keydown", (e) => {
+    try {
+      const tgt = e.target;
+      if (
+        tgt &&
+        (tgt.tagName === "INPUT" ||
+          tgt.tagName === "TEXTAREA" ||
+          tgt.isContentEditable)
+      )
+        return;
+
+      const k = e.key;
+      if (!/^[1-9]$/.test(k)) return;
+      const idx = Number(k) - 1;
+      if (idx < 0 || idx >= TRACK_COUNT) return;
+
+      const trackScreen = document.querySelector(".track-screen");
+      if (selectedTrack === idx) {
+        if (trackScreen) trackScreen.classList.toggle("collapsed");
+      } else {
+        if (trackScreen) trackScreen.classList.remove("collapsed");
+        selectedTrack = idx;
+        renderTrackUI(selectedTrack);
+      }
+      updateMixerUI();
+    } catch (err) {
+      console.warn("Keyboard handler error", err);
+    }
+  });
 }
 
 export { init, renderTrackUI, renderMixer, updateMixerUI, startUI, stopUI };
