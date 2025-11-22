@@ -1,2 +1,2 @@
-import { startUI, stopUI } from "../index.js";
+import { startUI, stopUI } from "../ui.js";
 export { startUI, stopUI };

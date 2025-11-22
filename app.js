@@ -9,7 +9,7 @@ import {
   setBpm,
 } from "./src/engine.js";
 import { init as uiInit, updateMixerUI, startUI, stopUI } from "./src/ui.js";
-import { STEPS } from "./src/config/index.js";
+import { STEPS } from "./src/config/constants.js";
 
 let playbackStartTime = null;
 

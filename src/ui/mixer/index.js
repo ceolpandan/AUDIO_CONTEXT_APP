@@ -1,2 +1,2 @@
-import { renderMixer, updateMixerUI } from "../index.js";
+import { renderMixer, updateMixerUI } from "../ui.js";
 export { renderMixer, updateMixerUI };

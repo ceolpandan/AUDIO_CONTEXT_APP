@@ -1,2 +1,2 @@
-import { renderTrackUI } from "../index.js";
+import { renderTrackUI } from "../ui.js";
 export { renderTrackUI };
