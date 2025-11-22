@@ -131,24 +131,15 @@ function renderTrackUI(trackIndex) {
   header.className = "track";
   header.innerHTML = `
     <h2>Track ${trackIndex + 1}</h2>
-    <div class="knobs">
-      <label>
-        Vol
-        <input class="knob volume" type="range" min="0" max="1" step="0.01" value="${
-          track.volume
-        }" />
-      </label>
-      <label>
-        Tone
-        <input class="knob tone" type="range" min="100" max="8000" step="100" value="${
-          track.filterFreq
-        }" />
-      </label>
-    </div>
   `;
 
   const stepsWrap = document.createElement("div");
   stepsWrap.className = "steps";
+
+  // per-track accent color mapped to the steps (used for active triggers)
+  const hue = Math.round((trackIndex * 360) / Math.max(1, TRACK_COUNT));
+  const color = `hsl(${hue} 75% 48%)`;
+  stepsWrap.style.setProperty("--track-accent", color);
 
   for (let s = 0; s < STEPS; s++) {
     const btn = document.createElement("button");
@@ -165,25 +156,14 @@ function renderTrackUI(trackIndex) {
   header.appendChild(stepsWrap);
   display.appendChild(header);
 
-  const volEl = display.querySelector(".volume");
-  if (volEl)
-    volEl.addEventListener("input", () => (track.volume = Number(volEl.value)));
-  const toneEl = display.querySelector(".tone");
-  if (toneEl)
-    toneEl.addEventListener(
-      "input",
-      () => (track.filterFreq = Number(toneEl.value))
-    );
-
+  // No per-track knobs in the sequencer view — the sequencer only displays triggers.
   if (info) {
     const sampleLabel = track.sampleUrl
       ? track.sampleUrl.replace(/^.*\//, "")
       : "—";
     info.innerHTML = `<span class="meta">Track ${
       trackIndex + 1
-    }</span><span>Sample: ${sampleLabel}</span><span>Vol: ${track.volume.toFixed(
-      2
-    )}</span><span>Tone: ${Math.round(track.filterFreq)}</span>`;
+    }</span><span>Sample: ${sampleLabel}</span>`;
   }
 }
 
