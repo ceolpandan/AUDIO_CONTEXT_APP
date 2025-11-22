@@ -1,0 +1,7 @@
+node_modules/
+dist/
+build/
+samples/
+.github/
+*.min.js
+*.lock

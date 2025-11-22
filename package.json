@@ -4,10 +4,20 @@
   "private": true,
   "scripts": {
     "dev": "node dev-server.js",
-    "start": "node dev-server.js"
+    "start": "node dev-server.js",
+    "lint": "eslint . --ext .js --fix",
+    "lint:ci": "eslint . --ext .js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "description": "Tiny dev server for live-reload during development",
   "engines": {
     "node": ">=12"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2"
   }
 }

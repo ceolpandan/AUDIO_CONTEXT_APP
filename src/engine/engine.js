@@ -9,7 +9,7 @@ import {
   DEFAULT_FILTER_FREQ,
   DEFAULT_FILTER_Q,
   DEFAULT_VOLUME,
-} from "../config/constants.js";
+} from '../config/constants.js';
 
 // Audio engine: audio context, Track, scheduling, and helper APIs
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -40,7 +40,7 @@ class Track {
     this.volume = DEFAULT_VOLUME;
     this.filterFreq = DEFAULT_FILTER_FREQ;
     // filter type and resonance (Q)
-    this.filterType = "lowpass";
+    this.filterType = 'lowpass';
     this.filterQ = 1;
 
     this.gainNode = context.createGain();
@@ -77,9 +77,9 @@ class Track {
       src.buffer = this.buffer;
 
       const filter = this.context.createBiquadFilter();
-      filter.type = merged.filterType || "lowpass";
+      filter.type = merged.filterType || 'lowpass';
       filter.frequency.value = merged.filterFreq;
-      if (typeof merged.filterQ === "number") filter.Q.value = merged.filterQ;
+      if (typeof merged.filterQ === 'number') filter.Q.value = merged.filterQ;
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);
@@ -94,15 +94,14 @@ class Track {
       // Oscillator fallback
       const osc = this.context.createOscillator();
       const baseFreq = 200 + (this.index % 8) * 60;
-      osc.type = "square";
+      osc.type = 'square';
       osc.frequency.setValueAtTime(baseFreq, time);
 
       const filter = this.context.createBiquadFilter();
-      filter.type = merged.filterType || "lowpass";
+      filter.type = merged.filterType || 'lowpass';
       filter.frequency.setValueAtTime(merged.filterFreq, time);
       try {
-        if (typeof merged.filterQ === "number")
-          filter.Q.setValueAtTime(merged.filterQ, time);
+        if (typeof merged.filterQ === 'number') filter.Q.setValueAtTime(merged.filterQ, time);
       } catch (e) {}
 
       const env = this.context.createGain();
@@ -142,9 +141,9 @@ function scheduleStep(stepIndex, time) {
 
     // notify UI that this track will trigger (UI can use this to flash mixers etc.)
     try {
-      if (typeof document !== "undefined") {
+      if (typeof document !== 'undefined') {
         document.dispatchEvent(
-          new CustomEvent("track-trigger", {
+          new CustomEvent('track-trigger', {
             detail: { trackIndex: track.index, step: stepIndex, time },
           })
         );
@@ -173,7 +172,7 @@ function scheduler() {
 let playbackStartTime = 0;
 
 async function start() {
-  if (audioCtx.state === "suspended") {
+  if (audioCtx.state === 'suspended') {
     await audioCtx.resume();
   }
   isPlaying = true;

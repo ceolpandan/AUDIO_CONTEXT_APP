@@ -1,12 +1,5 @@
-import {
-  audioCtx,
-  tracks,
-  updateMixerGains,
-  setBpm,
-  getBpm,
-  getAnalyser,
-} from "../engine.js";
-import { STEPS, TRACK_COUNT } from "../config/constants.js";
+import { audioCtx, tracks, updateMixerGains, setBpm, getBpm, getAnalyser } from '../engine.js';
+import { STEPS, TRACK_COUNT } from '../config/constants.js';
 
 let uiRaf = null;
 let lastUiStep = -1;
@@ -20,11 +13,11 @@ let scopeData = null;
 const _flashTimeouts = new Map();
 
 // listen for scheduled trigger events from the engine
-if (typeof document !== "undefined") {
-  document.addEventListener("track-trigger", (e) => {
+if (typeof document !== 'undefined') {
+  document.addEventListener('track-trigger', (e) => {
     try {
       const idx = e?.detail?.trackIndex;
-      if (typeof idx === "number") flashChannel(idx);
+      if (typeof idx === 'number') flashChannel(idx);
     } catch (err) {
       /* ignore */
     }
@@ -45,20 +38,20 @@ function stopUI() {
   if (uiRaf) cancelAnimationFrame(uiRaf);
   uiRaf = null;
   document
-    .querySelectorAll(".step--playhead")
-    .forEach((el) => el.classList.remove("step--playhead"));
+    .querySelectorAll('.step--playhead')
+    .forEach((el) => el.classList.remove('step--playhead'));
   lastUiStep = -1;
   stopScope();
 }
 
 function initScopeCanvas() {
-  scopeCanvas = document.getElementById("scope-canvas");
+  scopeCanvas = document.getElementById('scope-canvas');
   if (!scopeCanvas) return false;
   const dpr = window.devicePixelRatio || 1;
   const rect = scopeCanvas.getBoundingClientRect();
   scopeCanvas.width = Math.max(300, rect.width * dpr);
   scopeCanvas.height = Math.max(120, rect.height * dpr);
-  scopeCtx = scopeCanvas.getContext("2d");
+  scopeCtx = scopeCanvas.getContext('2d');
   scopeCtx.scale(dpr, dpr);
   analyserNode = getAnalyser();
   if (!analyserNode) return false;
@@ -76,11 +69,11 @@ function drawScope() {
 
   scopeCtx.clearRect(0, 0, w, h);
   // background
-  scopeCtx.fillStyle = "rgba(0,0,0,0.02)";
+  scopeCtx.fillStyle = 'rgba(0,0,0,0.02)';
   scopeCtx.fillRect(0, 0, w, h);
 
   scopeCtx.lineWidth = 2;
-  scopeCtx.strokeStyle = "hsl(160 80% 60%)";
+  scopeCtx.strokeStyle = 'hsl(160 80% 60%)';
   scopeCtx.beginPath();
   const step = scopeData.length / w;
   for (let x = 0; x < w; x++) {
@@ -116,52 +109,52 @@ function updatePlayhead(playbackStartTimeRef) {
   const uiStep = ((floatStep % STEPS) + STEPS) % STEPS;
   if (uiStep === lastUiStep) return;
 
-  const displayRoot = document.querySelector(".track-display");
+  const displayRoot = document.querySelector('.track-display');
   if (!displayRoot) return;
 
   if (lastUiStep >= 0) {
     displayRoot
       .querySelectorAll(`.step[data-step="${lastUiStep}"]`)
-      .forEach((el) => el.classList.remove("step--playhead"));
+      .forEach((el) => el.classList.remove('step--playhead'));
   }
 
   displayRoot
     .querySelectorAll(`.step[data-step="${uiStep}"]`)
-    .forEach((el) => el.classList.add("step--playhead"));
+    .forEach((el) => el.classList.add('step--playhead'));
   lastUiStep = uiStep;
 }
 
 function renderTrackUI(trackIndex) {
   const track = tracks[trackIndex];
-  const display = document.querySelector(".track-display");
-  const info = document.getElementById("track-info");
+  const display = document.querySelector('.track-display');
+  const info = document.getElementById('track-info');
   if (!display) return;
 
   lastUiStep = -1;
-  display.innerHTML = "";
+  display.innerHTML = '';
 
-  const header = document.createElement("div");
-  header.className = "track";
+  const header = document.createElement('div');
+  header.className = 'track';
   header.innerHTML = `
     <h2>Track ${trackIndex + 1}</h2>
   `;
 
-  const stepsWrap = document.createElement("div");
-  stepsWrap.className = "steps";
+  const stepsWrap = document.createElement('div');
+  stepsWrap.className = 'steps';
 
   // per-track accent color mapped to the steps (used for active triggers)
   const hue = Math.round((trackIndex * 360) / Math.max(1, TRACK_COUNT));
   const color = `hsl(${hue} 75% 48%)`;
-  stepsWrap.style.setProperty("--track-accent", color);
+  stepsWrap.style.setProperty('--track-accent', color);
 
   for (let s = 0; s < STEPS; s++) {
-    const btn = document.createElement("button");
-    btn.className = "step";
+    const btn = document.createElement('button');
+    btn.className = 'step';
     btn.dataset.step = String(s);
-    if (track.pattern[s] && track.pattern[s].trig) btn.classList.add("active");
-    btn.addEventListener("click", () => {
+    if (track.pattern[s] && track.pattern[s].trig) btn.classList.add('active');
+    btn.addEventListener('click', () => {
       track.pattern[s].trig = !track.pattern[s].trig;
-      btn.classList.toggle("active", track.pattern[s].trig);
+      btn.classList.toggle('active', track.pattern[s].trig);
     });
     stepsWrap.appendChild(btn);
   }
@@ -171,9 +164,7 @@ function renderTrackUI(trackIndex) {
 
   // No per-track knobs in the sequencer view — the sequencer only displays triggers.
   if (info) {
-    const sampleLabel = track.sampleUrl
-      ? track.sampleUrl.replace(/^.*\//, "")
-      : "—";
+    const sampleLabel = track.sampleUrl ? track.sampleUrl.replace(/^.*\//, '') : '—';
     info.innerHTML = `<span class="meta">Track ${
       trackIndex + 1
     }</span><span>Sample: ${sampleLabel}</span>`;
@@ -181,50 +172,48 @@ function renderTrackUI(trackIndex) {
 }
 
 function renderMixer() {
-  const mixerRoot = document.getElementById("mixer");
+  const mixerRoot = document.getElementById('mixer');
   if (!mixerRoot) return;
-  mixerRoot.innerHTML = "";
-  const header = document.createElement("div");
-  header.className = "track-info";
+  mixerRoot.innerHTML = '';
+  const header = document.createElement('div');
+  header.className = 'track-info';
   header.innerHTML = `<div class="meta">Mixer</div><div class="muted">Mute / Solo per track</div>`;
   mixerRoot.appendChild(header);
 
-  const grid = document.createElement("div");
-  grid.className = "mixer-grid";
+  const grid = document.createElement('div');
+  grid.className = 'mixer-grid';
 
   tracks.forEach((t, i) => {
-    const ch = document.createElement("div");
-    ch.className = "channel";
+    const ch = document.createElement('div');
+    ch.className = 'channel';
     ch.dataset.track = String(i);
     const hue = Math.round((i * 360) / Math.max(1, TRACK_COUNT));
     const color = `hsl(${hue} 75% 48%)`;
-    ch.style.setProperty("--channel-accent", color);
+    ch.style.setProperty('--channel-accent', color);
 
-    const label = document.createElement("div");
-    label.className = "label";
-    label.textContent = t.sampleUrl
-      ? t.sampleUrl.replace(/^.*\//, "")
-      : `Track ${i + 1}`;
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = t.sampleUrl ? t.sampleUrl.replace(/^.*\//, '') : `Track ${i + 1}`;
 
-    const controls = document.createElement("div");
-    controls.className = "controls";
+    const controls = document.createElement('div');
+    controls.className = 'controls';
 
-    const mute = document.createElement("button");
-    mute.className = "mute";
-    mute.title = "Mute";
-    mute.textContent = "M";
-    mute.addEventListener("click", (e) => {
+    const mute = document.createElement('button');
+    mute.className = 'mute';
+    mute.title = 'Mute';
+    mute.textContent = 'M';
+    mute.addEventListener('click', (e) => {
       e.stopPropagation();
       t.muted = !t.muted;
       updateMixerGains();
       updateMixerUI();
     });
 
-    const solo = document.createElement("button");
-    solo.className = "solo";
-    solo.title = "Solo";
-    solo.textContent = "S";
-    solo.addEventListener("click", (e) => {
+    const solo = document.createElement('button');
+    solo.className = 'solo';
+    solo.title = 'Solo';
+    solo.textContent = 'S';
+    solo.addEventListener('click', (e) => {
       e.stopPropagation();
       t.solo = !t.solo;
       updateMixerGains();
@@ -235,20 +224,19 @@ function renderMixer() {
     controls.appendChild(solo);
 
     // per-channel fader control
-    const faderWrap = document.createElement("div");
-    faderWrap.className = "fader-wrap";
-    const fader = document.createElement("input");
-    fader.type = "range";
-    fader.min = "0";
-    fader.max = "1";
-    fader.step = "0.01";
-    const currentLevel =
-      typeof t.level === "number" ? t.level : t.gainNode?.gain?.value ?? 1;
+    const faderWrap = document.createElement('div');
+    faderWrap.className = 'fader-wrap';
+    const fader = document.createElement('input');
+    fader.type = 'range';
+    fader.min = '0';
+    fader.max = '1';
+    fader.step = '0.01';
+    const currentLevel = typeof t.level === 'number' ? t.level : (t.gainNode?.gain?.value ?? 1);
     fader.value = String(currentLevel);
-    fader.title = "Level";
+    fader.title = 'Level';
     faderWrap.appendChild(fader);
     // bind fader to track gain with smoothing
-    fader.addEventListener("input", () => {
+    fader.addEventListener('input', () => {
       const v = Number(fader.value);
       const now = audioCtx.currentTime;
       try {
@@ -270,21 +258,21 @@ function renderMixer() {
     ch.appendChild(label);
     ch.appendChild(controls);
 
-    ch.addEventListener("click", (e) => {
+    ch.addEventListener('click', (e) => {
       if (
         e.target &&
-        (e.target.classList.contains("mute") ||
-          e.target.classList.contains("solo"))
-      )
+        (e.target.classList.contains('mute') || e.target.classList.contains('solo'))
+      ) {
         return;
+      }
       // Toggle sequencer visibility when clicking the same channel;
       // otherwise select and show the sequencer for the clicked channel.
-      const trackScreen = document.querySelector(".track-screen");
+      const trackScreen = document.querySelector('.track-screen');
       const wasSelected = selectedTrack === i;
       if (wasSelected && trackScreen) {
-        trackScreen.classList.toggle("collapsed");
+        trackScreen.classList.toggle('collapsed');
       } else {
-        if (trackScreen) trackScreen.classList.remove("collapsed");
+        if (trackScreen) trackScreen.classList.remove('collapsed');
         selectedTrack = i;
         renderTrackUI(selectedTrack);
         renderFilterUI(selectedTrack);
@@ -300,9 +288,7 @@ function renderMixer() {
 }
 
 function flashChannel(index, ms = 160) {
-  const el = document.querySelector(
-    `.mixer-grid .channel[data-track="${index}"]`
-  );
+  const el = document.querySelector(`.mixer-grid .channel[data-track="${index}"]`);
   if (!el) return;
   // clear existing timeout
   const prev = _flashTimeouts.get(index);
@@ -310,9 +296,9 @@ function flashChannel(index, ms = 160) {
     clearTimeout(prev);
     _flashTimeouts.delete(index);
   }
-  el.classList.add("channel--hit");
+  el.classList.add('channel--hit');
   const tid = setTimeout(() => {
-    el.classList.remove("channel--hit");
+    el.classList.remove('channel--hit');
     _flashTimeouts.delete(index);
   }, ms);
   _flashTimeouts.set(index, tid);
@@ -320,59 +306,57 @@ function flashChannel(index, ms = 160) {
 
 // Render filter controls for the selected track into the right-side filter panel
 function renderFilterUI(trackIndex) {
-  const panel = document.getElementById("filter");
+  const panel = document.getElementById('filter');
   if (!panel) return;
   const track = tracks[trackIndex];
-  panel.innerHTML = "";
+  panel.innerHTML = '';
 
   const FREQ_MIN = 20;
   const FREQ_MAX = 12000;
   const Q_MIN = 0.1;
   const Q_MAX = 20;
 
-  const title = document.createElement("h3");
+  const title = document.createElement('h3');
   title.textContent = `Filter — Track ${trackIndex + 1}`;
   panel.appendChild(title);
 
-  const sampleLabel = document.createElement("div");
-  sampleLabel.className = "filter-note";
-  sampleLabel.textContent = track.sampleUrl
-    ? track.sampleUrl.replace(/^.*\//, "")
-    : "—";
+  const sampleLabel = document.createElement('div');
+  sampleLabel.className = 'filter-note';
+  sampleLabel.textContent = track.sampleUrl ? track.sampleUrl.replace(/^.*\//, '') : '—';
   panel.appendChild(sampleLabel);
 
   // Slope canvas (visualization + draggable point)
-  const slopeWrap = document.createElement("div");
-  slopeWrap.className = "filter-slope-wrap";
-  const slopeCanvas = document.createElement("canvas");
-  slopeCanvas.className = "filter-slope";
-  slopeCanvas.setAttribute("aria-label", "Filter response");
+  const slopeWrap = document.createElement('div');
+  slopeWrap.className = 'filter-slope-wrap';
+  const slopeCanvas = document.createElement('canvas');
+  slopeCanvas.className = 'filter-slope';
+  slopeCanvas.setAttribute('aria-label', 'Filter response');
   slopeWrap.appendChild(slopeCanvas);
   panel.appendChild(slopeWrap);
 
   // Type buttons (shorthand)
   const types = [
-    ["lowpass", "LP"],
-    ["highpass", "HP"],
-    ["bandpass", "BP"],
-    ["notch", "NT"],
-    ["allpass", "AP"],
-    ["peaking", "PK"],
+    ['lowpass', 'LP'],
+    ['highpass', 'HP'],
+    ['bandpass', 'BP'],
+    ['notch', 'NT'],
+    ['allpass', 'AP'],
+    ['peaking', 'PK'],
   ];
-  const typeRow = document.createElement("div");
-  typeRow.className = "filter-type-row";
+  const typeRow = document.createElement('div');
+  typeRow.className = 'filter-type-row';
   types.forEach(([val, label]) => {
-    const btn = document.createElement("button");
-    btn.className = "filter-type-btn";
-    btn.type = "button";
+    const btn = document.createElement('button');
+    btn.className = 'filter-type-btn';
+    btn.type = 'button';
     btn.textContent = label;
-    if (track.filterType === val) btn.classList.add("active");
-    btn.addEventListener("click", () => {
+    if (track.filterType === val) btn.classList.add('active');
+    btn.addEventListener('click', () => {
       track.filterType = val;
       // update active state
       typeRow
-        .querySelectorAll(".filter-type-btn")
-        .forEach((b) => b.classList.toggle("active", b === btn));
+        .querySelectorAll('.filter-type-btn')
+        .forEach((b) => b.classList.toggle('active', b === btn));
       draw();
     });
     typeRow.appendChild(btn);
@@ -380,18 +364,18 @@ function renderFilterUI(trackIndex) {
   panel.appendChild(typeRow);
 
   // Frequency + Q ranges (kept for accessibility; updated from slope drag)
-  const rowFreq = document.createElement("div");
-  rowFreq.className = "filter-row";
-  const lblFreq = document.createElement("label");
-  lblFreq.textContent = "Freq";
-  const freq = document.createElement("input");
-  freq.type = "range";
+  const rowFreq = document.createElement('div');
+  rowFreq.className = 'filter-row';
+  const lblFreq = document.createElement('label');
+  lblFreq.textContent = 'Freq';
+  const freq = document.createElement('input');
+  freq.type = 'range';
   freq.min = String(FREQ_MIN);
   freq.max = String(FREQ_MAX);
-  freq.step = "1";
+  freq.step = '1';
   freq.value = String(track.filterFreq || 2000);
-  freq.className = "control";
-  freq.addEventListener("input", () => {
+  freq.className = 'control';
+  freq.addEventListener('input', () => {
     track.filterFreq = Number(freq.value);
     draw();
   });
@@ -399,18 +383,18 @@ function renderFilterUI(trackIndex) {
   rowFreq.appendChild(freq);
   panel.appendChild(rowFreq);
 
-  const rowQ = document.createElement("div");
-  rowQ.className = "filter-row";
-  const lblQ = document.createElement("label");
-  lblQ.textContent = "Res";
-  const q = document.createElement("input");
-  q.type = "range";
+  const rowQ = document.createElement('div');
+  rowQ.className = 'filter-row';
+  const lblQ = document.createElement('label');
+  lblQ.textContent = 'Res';
+  const q = document.createElement('input');
+  q.type = 'range';
   q.min = String(Q_MIN);
   q.max = String(Q_MAX);
-  q.step = "0.1";
+  q.step = '0.1';
   q.value = String(track.filterQ || 1);
-  q.className = "control";
-  q.addEventListener("input", () => {
+  q.className = 'control';
+  q.addEventListener('input', () => {
     track.filterQ = Number(q.value);
     draw();
   });
@@ -419,10 +403,9 @@ function renderFilterUI(trackIndex) {
   panel.appendChild(rowQ);
 
   // hint
-  const hint = document.createElement("div");
-  hint.className = "filter-note";
-  hint.textContent =
-    "Drag the handle to change frequency (x) and resonance (y).";
+  const hint = document.createElement('div');
+  hint.className = 'filter-note';
+  hint.textContent = 'Drag the handle to change frequency (x) and resonance (y).';
   panel.appendChild(hint);
 
   // --- drawing helpers ---
@@ -431,7 +414,7 @@ function renderFilterUI(trackIndex) {
     const rect = slopeCanvas.getBoundingClientRect();
     slopeCanvas.width = Math.max(300, rect.width * dpr);
     slopeCanvas.height = Math.max(120, rect.height * dpr);
-    slopeCanvas.getContext("2d").scale(dpr, dpr);
+    slopeCanvas.getContext('2d').scale(dpr, dpr);
   }
 
   function freqToX(f) {
@@ -472,7 +455,7 @@ function renderFilterUI(trackIndex) {
     const h = rect.height;
     ctx.clearRect(0, 0, w, h);
     // background
-    ctx.fillStyle = "rgba(255,255,255,0.02)";
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
     ctx.fillRect(0, 0, w, h);
 
     // compute frequency response via BiquadFilterNode
@@ -488,7 +471,7 @@ function renderFilterUI(trackIndex) {
     }
     try {
       const bf = audioCtx.createBiquadFilter();
-      bf.type = track.filterType || "lowpass";
+      bf.type = track.filterType || 'lowpass';
       bf.frequency.value = track.filterFreq || 2000;
       bf.Q.value = track.filterQ || 1;
       bf.getFrequencyResponse(freqs, mags, phases);
@@ -512,15 +495,15 @@ function renderFilterUI(trackIndex) {
       else ctx.lineTo(x, y);
     }
     ctx.lineWidth = 2;
-    ctx.strokeStyle = "hsl(200 80% 60%)";
+    ctx.strokeStyle = 'hsl(200 80% 60%)';
     ctx.stroke();
 
     // draw draggable handle at current freq
     const hx = freqToX(track.filterFreq || 2000);
     const hy = qToY(track.filterQ || 1);
     ctx.beginPath();
-    ctx.fillStyle = "#fff";
-    ctx.strokeStyle = "rgba(0,0,0,0.6)";
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
     ctx.lineWidth = 2;
     ctx.arc(hx, hy, 6, 0, Math.PI * 2);
     ctx.fill();
@@ -529,7 +512,7 @@ function renderFilterUI(trackIndex) {
 
   function draw() {
     if (!slopeCanvas) return;
-    const ctx = slopeCanvas.getContext("2d");
+    const ctx = slopeCanvas.getContext('2d');
     // ensure canvas size matches element
     const cssRect = slopeCanvas.getBoundingClientRect();
     slopeCanvas.width = Math.max(300, cssRect.width * dpr);
@@ -540,21 +523,21 @@ function renderFilterUI(trackIndex) {
     freq.value = String(Math.round(track.filterFreq || 2000));
     q.value = String(Number(track.filterQ || 1).toFixed(1));
     // update active type button
-    const btns = typeRow.querySelectorAll(".filter-type-btn");
+    const btns = typeRow.querySelectorAll('.filter-type-btn');
     btns.forEach((b) =>
       b.classList.toggle(
-        "active",
+        'active',
         b.textContent ===
           (function () {
             const map = {
-              lowpass: "LP",
-              highpass: "HP",
-              bandpass: "BP",
-              notch: "NT",
-              allpass: "AP",
-              peaking: "PK",
+              lowpass: 'LP',
+              highpass: 'HP',
+              bandpass: 'BP',
+              notch: 'NT',
+              allpass: 'AP',
+              peaking: 'PK',
             };
-            return map[track.filterType] || "";
+            return map[track.filterType] || '';
           })()
       )
     );
@@ -568,7 +551,7 @@ function renderFilterUI(trackIndex) {
     const y = e.clientY - r.top;
     return { x, y };
   }
-  slopeCanvas.addEventListener("pointerdown", (ev) => {
+  slopeCanvas.addEventListener('pointerdown', (ev) => {
     ev.preventDefault();
     slopeCanvas.setPointerCapture(ev.pointerId);
     dragging = true;
@@ -579,7 +562,7 @@ function renderFilterUI(trackIndex) {
     track.filterQ = qv;
     draw();
   });
-  slopeCanvas.addEventListener("pointermove", (ev) => {
+  slopeCanvas.addEventListener('pointermove', (ev) => {
     if (!dragging) return;
     const p = getLocalPos(ev);
     const f = xToFreq(p.x);
@@ -588,7 +571,7 @@ function renderFilterUI(trackIndex) {
     track.filterQ = qv;
     draw();
   });
-  slopeCanvas.addEventListener("pointerup", (ev) => {
+  slopeCanvas.addEventListener('pointerup', (ev) => {
     if (!dragging) return;
     dragging = false;
     try {
@@ -603,30 +586,28 @@ function renderFilterUI(trackIndex) {
 }
 
 function updateMixerUI() {
-  const grid = document.querySelector(".mixer-grid");
+  const grid = document.querySelector('.mixer-grid');
   if (!grid) return;
-  grid.querySelectorAll(".channel").forEach((el) => {
+  grid.querySelectorAll('.channel').forEach((el) => {
     const idx = Number(el.dataset.track);
     const track = tracks[idx];
-    const muteBtn = el.querySelector(".mute");
-    const soloBtn = el.querySelector(".solo");
-    if (muteBtn) muteBtn.classList.toggle("active", !!track.muted);
-    if (soloBtn) soloBtn.classList.toggle("active", !!track.solo);
-    const faderEl = el.querySelector(".fader-wrap input");
+    const muteBtn = el.querySelector('.mute');
+    const soloBtn = el.querySelector('.solo');
+    if (muteBtn) muteBtn.classList.toggle('active', !!track.muted);
+    if (soloBtn) soloBtn.classList.toggle('active', !!track.solo);
+    const faderEl = el.querySelector('.fader-wrap input');
     if (faderEl) {
       const val =
-        typeof track.level === "number"
-          ? track.level
-          : track.gainNode?.gain?.value ?? 1;
+        typeof track.level === 'number' ? track.level : (track.gainNode?.gain?.value ?? 1);
       faderEl.value = String(val);
     }
-    el.classList.toggle("active", idx === selectedTrack);
+    el.classList.toggle('active', idx === selectedTrack);
   });
 }
 
 function init(playbackStartTimeRefGetter) {
   // Build UI shell
-  const tracksContainer = document.querySelector(".tracks");
+  const tracksContainer = document.querySelector('.tracks');
   if (tracksContainer) {
     tracksContainer.innerHTML = `
       <div class="sequencer-controls">
@@ -643,13 +624,13 @@ function init(playbackStartTimeRefGetter) {
     renderMixer();
     renderFilterUI(selectedTrack);
 
-    document.getElementById("prev-track").addEventListener("click", () => {
+    document.getElementById('prev-track').addEventListener('click', () => {
       selectedTrack = (selectedTrack - 1 + TRACK_COUNT) % TRACK_COUNT;
       renderTrackUI(selectedTrack);
       updateMixerUI();
       renderFilterUI(selectedTrack);
     });
-    document.getElementById("next-track").addEventListener("click", () => {
+    document.getElementById('next-track').addEventListener('click', () => {
       selectedTrack = (selectedTrack + 1) % TRACK_COUNT;
       renderTrackUI(selectedTrack);
       updateMixerUI();
@@ -657,10 +638,10 @@ function init(playbackStartTimeRefGetter) {
     });
   }
 
-  const bpmEl = document.getElementById("bpm");
+  const bpmEl = document.getElementById('bpm');
   if (bpmEl) {
     bpmEl.value = getBpm();
-    bpmEl.addEventListener("input", () => {
+    bpmEl.addEventListener('input', () => {
       setBpm(Number(bpmEl.value));
     });
   }
@@ -668,34 +649,30 @@ function init(playbackStartTimeRefGetter) {
   // Play/Stop are handled by the application bootstrap (app2.js).
 
   // Keyboard shortcuts: keys 1..N select tracks (toggle if same key pressed twice)
-  window.addEventListener("keydown", (e) => {
+  window.addEventListener('keydown', (e) => {
     try {
       const tgt = e.target;
-      if (
-        tgt &&
-        (tgt.tagName === "INPUT" ||
-          tgt.tagName === "TEXTAREA" ||
-          tgt.isContentEditable)
-      )
+      if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.isContentEditable)) {
         return;
+      }
 
       const k = e.key;
       if (!/^[1-9]$/.test(k)) return;
       const idx = Number(k) - 1;
       if (idx < 0 || idx >= TRACK_COUNT) return;
 
-      const trackScreen = document.querySelector(".track-screen");
+      const trackScreen = document.querySelector('.track-screen');
       if (selectedTrack === idx) {
-        if (trackScreen) trackScreen.classList.toggle("collapsed");
+        if (trackScreen) trackScreen.classList.toggle('collapsed');
       } else {
-        if (trackScreen) trackScreen.classList.remove("collapsed");
+        if (trackScreen) trackScreen.classList.remove('collapsed');
         selectedTrack = idx;
         renderTrackUI(selectedTrack);
         renderFilterUI(selectedTrack);
       }
       updateMixerUI();
     } catch (err) {
-      console.warn("Keyboard handler error", err);
+      console.warn('Keyboard handler error', err);
     }
   });
 }

@@ -1,2 +1,2 @@
-import { renderFilterUI } from "../ui.js";
+import { renderFilterUI } from '../ui.js';
 export { renderFilterUI };

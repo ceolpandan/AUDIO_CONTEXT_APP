@@ -7,22 +7,22 @@ import {
   stop as engineStop,
   updateMixerGains,
   setBpm,
-} from "./src/engine.js";
-import { init as uiInit, updateMixerUI, startUI, stopUI } from "./src/ui.js";
-import { STEPS } from "./src/config/constants.js";
+} from './src/engine.js';
+import { init as uiInit, updateMixerUI, startUI, stopUI } from './src/ui.js';
+import { STEPS } from './src/config/constants.js';
 
 let playbackStartTime = null;
 
 async function boot() {
   const sampleUrls = [
-    "samples/kick1.wav",
-    "samples/snare.wav",
-    "samples/hat1.wav",
-    "samples/hat2.wav",
-    "samples/clap.wav",
-    "samples/perc1.wav",
-    "samples/perc2.wav",
-    "samples/perc3.wav",
+    'samples/kick1.wav',
+    'samples/snare.wav',
+    'samples/hat1.wav',
+    'samples/hat2.wav',
+    'samples/clap.wav',
+    'samples/perc1.wav',
+    'samples/perc2.wav',
+    'samples/perc3.wav',
   ];
 
   await createTracksFromUrls(sampleUrls);
@@ -97,10 +97,10 @@ async function boot() {
   uiInit(() => playbackStartTime);
 
   // Wire play/stop to set playbackStartTime for UI
-  const playBtn = document.getElementById("play-btn");
-  const stopBtn = document.getElementById("stop-btn");
+  const playBtn = document.getElementById('play-btn');
+  const stopBtn = document.getElementById('stop-btn');
   if (playBtn) {
-    playBtn.addEventListener("click", async () => {
+    playBtn.addEventListener('click', async () => {
       await engineStart();
       // use exported audioCtx for an accurate time reference
       playbackStartTime = audioCtx.currentTime;
@@ -109,7 +109,7 @@ async function boot() {
     });
   }
   if (stopBtn) {
-    stopBtn.addEventListener("click", () => {
+    stopBtn.addEventListener('click', () => {
       engineStop();
       playbackStartTime = null;
       stopUI();
@@ -120,7 +120,7 @@ async function boot() {
   updateMixerGains();
   updateMixerUI();
 
-  console.log("App booted — press Play");
+  console.log('App booted — press Play');
 }
 
-boot().catch((err) => console.error("Boot failed:", err));
+boot().catch((err) => console.error('Boot failed:', err));

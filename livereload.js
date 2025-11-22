@@ -1,10 +1,10 @@
 // Simple client for SSE-based livereload server
 (function () {
-  if (typeof EventSource === "undefined") return;
-  var es = new EventSource("/events");
-  es.addEventListener("reload", function (ev) {
+  if (typeof EventSource === 'undefined') return;
+  var es = new EventSource('/events');
+  es.addEventListener('reload', function (ev) {
     try {
-      console.log("[livereload] reload event received");
+      console.log('[livereload] reload event received');
       // give a small timeout so multiple quick edits don't reload before page settles
       setTimeout(function () {
         location.reload();
@@ -14,7 +14,7 @@
     }
   });
   es.onopen = function () {
-    console.log("[livereload] connected");
+    console.log('[livereload] connected');
   };
   es.onerror = function (e) {
     // Do not spam the console when server not running

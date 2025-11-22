@@ -11,7 +11,6 @@ A compact, modular web-audio step sequencer (mini drum-machine) built with nativ
 
 - **Requirements:**: Node.js (>=12) for the dev server and a modern browser for the Web Audio API.
 - **Run dev server (recommended):**
-
   - From a Windows `cmd.exe` shell (recommended to avoid PowerShell script policy issues):
 
     ```cmd
@@ -47,7 +46,6 @@ A compact, modular web-audio step sequencer (mini drum-machine) built with nativ
 **Core Concepts**
 
 - **Engine vs UI (Separation of Concerns)**
-
   - **Engine (`src/engine/engine.js`)**: Responsible for audio scheduling, track state, mixing and producing an `AnalyserNode` for the UI scope. It exposes functions such as:
     - `audioCtx` — the shared `AudioContext` instance.
     - `createTracksFromUrls(urls)` — loads samples and creates `Track` objects.
@@ -58,7 +56,6 @@ A compact, modular web-audio step sequencer (mini drum-machine) built with nativ
   - **UI (`src/ui/ui.js`)**: Renders the sequencer, mixer and filter UI and binds events. The UI subscribes to semantic DOM events from the engine (see below) and updates visuals.
 
 - **Track model**
-
   - Each `Track` contains:
     - `pattern`: Array of `STEPS` objects { trig: boolean, locks: {} }.
     - `buffer`: decoded sample data or `null` (oscillator fallback).
