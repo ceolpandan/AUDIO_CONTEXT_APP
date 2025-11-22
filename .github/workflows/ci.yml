@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          if [ -f package-lock.json ]; then npm install; else npm install; fi
 
       - name: Smoke test
         run: |
