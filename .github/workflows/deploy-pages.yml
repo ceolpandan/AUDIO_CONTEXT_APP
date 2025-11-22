@@ -4,11 +4,19 @@ on:
     branches:
       - main
 
+# Grant the workflow explicit permissions needed to publish pages
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Ensure the checkout action leaves the auth token for later pushes
+          persist-credentials: true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
