@@ -293,6 +293,11 @@ function renderFilterUI(trackIndex) {
   const track = tracks[trackIndex];
   panel.innerHTML = "";
 
+  const FREQ_MIN = 20;
+  const FREQ_MAX = 12000;
+  const Q_MIN = 0.1;
+  const Q_MAX = 20;
+
   const title = document.createElement("h3");
   title.textContent = `Filter — Track ${trackIndex + 1}`;
   panel.appendChild(title);
@@ -304,62 +309,78 @@ function renderFilterUI(trackIndex) {
     : "—";
   panel.appendChild(sampleLabel);
 
-  // Filter type
-  const rowType = document.createElement("div");
-  rowType.className = "filter-row";
-  const lblType = document.createElement("label");
-  lblType.textContent = "Type";
-  const sel = document.createElement("select");
-  sel.className = "control";
-  ["lowpass", "highpass", "bandpass", "notch", "allpass", "peaking"].forEach(
-    (t) => {
-      const opt = document.createElement("option");
-      opt.value = t;
-      opt.textContent = t;
-      if (t === track.filterType) opt.selected = true;
-      sel.appendChild(opt);
-    }
-  );
-  sel.addEventListener("change", () => {
-    track.filterType = sel.value;
-  });
-  rowType.appendChild(lblType);
-  rowType.appendChild(sel);
-  panel.appendChild(rowType);
+  // Slope canvas (visualization + draggable point)
+  const slopeWrap = document.createElement("div");
+  slopeWrap.className = "filter-slope-wrap";
+  const slopeCanvas = document.createElement("canvas");
+  slopeCanvas.className = "filter-slope";
+  slopeCanvas.setAttribute("aria-label", "Filter response");
+  slopeWrap.appendChild(slopeCanvas);
+  panel.appendChild(slopeWrap);
 
-  // Frequency
+  // Type buttons (shorthand)
+  const types = [
+    ["lowpass", "LP"],
+    ["highpass", "HP"],
+    ["bandpass", "BP"],
+    ["notch", "NT"],
+    ["allpass", "AP"],
+    ["peaking", "PK"],
+  ];
+  const typeRow = document.createElement("div");
+  typeRow.className = "filter-type-row";
+  types.forEach(([val, label]) => {
+    const btn = document.createElement("button");
+    btn.className = "filter-type-btn";
+    btn.type = "button";
+    btn.textContent = label;
+    if (track.filterType === val) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      track.filterType = val;
+      // update active state
+      typeRow
+        .querySelectorAll(".filter-type-btn")
+        .forEach((b) => b.classList.toggle("active", b === btn));
+      draw();
+    });
+    typeRow.appendChild(btn);
+  });
+  panel.appendChild(typeRow);
+
+  // Frequency + Q ranges (kept for accessibility; updated from slope drag)
   const rowFreq = document.createElement("div");
   rowFreq.className = "filter-row";
   const lblFreq = document.createElement("label");
   lblFreq.textContent = "Freq";
   const freq = document.createElement("input");
   freq.type = "range";
-  freq.min = "20";
-  freq.max = "12000";
+  freq.min = String(FREQ_MIN);
+  freq.max = String(FREQ_MAX);
   freq.step = "1";
   freq.value = String(track.filterFreq || 2000);
   freq.className = "control";
   freq.addEventListener("input", () => {
     track.filterFreq = Number(freq.value);
+    draw();
   });
   rowFreq.appendChild(lblFreq);
   rowFreq.appendChild(freq);
   panel.appendChild(rowFreq);
 
-  // Resonance (Q)
   const rowQ = document.createElement("div");
   rowQ.className = "filter-row";
   const lblQ = document.createElement("label");
   lblQ.textContent = "Res";
   const q = document.createElement("input");
   q.type = "range";
-  q.min = "0.1";
-  q.max = "20";
+  q.min = String(Q_MIN);
+  q.max = String(Q_MAX);
   q.step = "0.1";
   q.value = String(track.filterQ || 1);
   q.className = "control";
   q.addEventListener("input", () => {
     track.filterQ = Number(q.value);
+    draw();
   });
   rowQ.appendChild(lblQ);
   rowQ.appendChild(q);
@@ -368,8 +389,185 @@ function renderFilterUI(trackIndex) {
   // hint
   const hint = document.createElement("div");
   hint.className = "filter-note";
-  hint.textContent = "Changes affect subsequent triggers.";
+  hint.textContent =
+    "Drag the handle to change frequency (x) and resonance (y).";
   panel.appendChild(hint);
+
+  // --- drawing helpers ---
+  const dpr = window.devicePixelRatio || 1;
+  function resizeCanvas() {
+    const rect = slopeCanvas.getBoundingClientRect();
+    slopeCanvas.width = Math.max(300, rect.width * dpr);
+    slopeCanvas.height = Math.max(120, rect.height * dpr);
+    slopeCanvas.getContext("2d").scale(dpr, dpr);
+  }
+
+  function freqToX(f) {
+    const rect = slopeCanvas.getBoundingClientRect();
+    const w = rect.width;
+    const min = FREQ_MIN;
+    const max = FREQ_MAX;
+    const lx = Math.log10(f / min) / Math.log10(max / min);
+    return lx * w;
+  }
+  function xToFreq(x) {
+    const rect = slopeCanvas.getBoundingClientRect();
+    const w = rect.width;
+    const t = Math.max(0, Math.min(1, x / w));
+    const min = FREQ_MIN;
+    const max = FREQ_MAX;
+    const f = min * Math.pow(max / min, t);
+    return f;
+  }
+  function yToQ(y) {
+    const rect = slopeCanvas.getBoundingClientRect();
+    const h = rect.height;
+    const t = 1 - Math.max(0, Math.min(1, y / h)); // top -> 1
+    // map t (0..1) to Q range (Q_MIN..Q_MAX) exponential-ish
+    const qv = Q_MIN * Math.pow(Q_MAX / Q_MIN, t);
+    return qv;
+  }
+  function qToY(qv) {
+    const rect = slopeCanvas.getBoundingClientRect();
+    const h = rect.height;
+    const t = Math.log(qv / Q_MIN) / Math.log(Q_MAX / Q_MIN);
+    return (1 - t) * h;
+  }
+
+  function drawResponse(ctx, track) {
+    const rect = slopeCanvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+    ctx.clearRect(0, 0, w, h);
+    // background
+    ctx.fillStyle = "rgba(255,255,255,0.02)";
+    ctx.fillRect(0, 0, w, h);
+
+    // compute frequency response via BiquadFilterNode
+    const bins = 256;
+    const freqs = new Float32Array(bins);
+    const mags = new Float32Array(bins);
+    const phases = new Float32Array(bins);
+    const min = FREQ_MIN;
+    const max = Math.min(FREQ_MAX, audioCtx.sampleRate / 2);
+    for (let i = 0; i < bins; i++) {
+      const t = i / (bins - 1);
+      freqs[i] = min * Math.pow(max / min, t);
+    }
+    try {
+      const bf = audioCtx.createBiquadFilter();
+      bf.type = track.filterType || "lowpass";
+      bf.frequency.value = track.filterFreq || 2000;
+      bf.Q.value = track.filterQ || 1;
+      bf.getFrequencyResponse(freqs, mags, phases);
+    } catch (e) {
+      for (let i = 0; i < bins; i++) mags[i] = 1;
+    }
+
+    // draw magnitude response (dB)
+    ctx.beginPath();
+    for (let i = 0; i < bins; i++) {
+      const f = freqs[i];
+      const mag = mags[i];
+      const db = 20 * Math.log10(Math.max(1e-6, mag));
+      // map db (-60..+12) to y
+      const minDb = -60;
+      const maxDb = 12;
+      const ny = (db - minDb) / (maxDb - minDb);
+      const y = (1 - ny) * h;
+      const x = (Math.log10(f / min) / Math.log10(max / min)) * w;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "hsl(200 80% 60%)";
+    ctx.stroke();
+
+    // draw draggable handle at current freq
+    const hx = freqToX(track.filterFreq || 2000);
+    const hy = qToY(track.filterQ || 1);
+    ctx.beginPath();
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "rgba(0,0,0,0.6)";
+    ctx.lineWidth = 2;
+    ctx.arc(hx, hy, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  function draw() {
+    if (!slopeCanvas) return;
+    const ctx = slopeCanvas.getContext("2d");
+    // ensure canvas size matches element
+    const cssRect = slopeCanvas.getBoundingClientRect();
+    slopeCanvas.width = Math.max(300, cssRect.width * dpr);
+    slopeCanvas.height = Math.max(120, cssRect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawResponse(ctx, track);
+    // update range controls
+    freq.value = String(Math.round(track.filterFreq || 2000));
+    q.value = String(Number(track.filterQ || 1).toFixed(1));
+    // update active type button
+    const btns = typeRow.querySelectorAll(".filter-type-btn");
+    btns.forEach((b) =>
+      b.classList.toggle(
+        "active",
+        b.textContent ===
+          (function () {
+            const map = {
+              lowpass: "LP",
+              highpass: "HP",
+              bandpass: "BP",
+              notch: "NT",
+              allpass: "AP",
+              peaking: "PK",
+            };
+            return map[track.filterType] || "";
+          })()
+      )
+    );
+  }
+
+  // pointer drag to set freq (x) and Q (y)
+  let dragging = false;
+  function getLocalPos(e) {
+    const r = slopeCanvas.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    return { x, y };
+  }
+  slopeCanvas.addEventListener("pointerdown", (ev) => {
+    ev.preventDefault();
+    slopeCanvas.setPointerCapture(ev.pointerId);
+    dragging = true;
+    const p = getLocalPos(ev);
+    const f = xToFreq(p.x);
+    const qv = yToQ(p.y);
+    track.filterFreq = f;
+    track.filterQ = qv;
+    draw();
+  });
+  slopeCanvas.addEventListener("pointermove", (ev) => {
+    if (!dragging) return;
+    const p = getLocalPos(ev);
+    const f = xToFreq(p.x);
+    const qv = yToQ(p.y);
+    track.filterFreq = f;
+    track.filterQ = qv;
+    draw();
+  });
+  slopeCanvas.addEventListener("pointerup", (ev) => {
+    if (!dragging) return;
+    dragging = false;
+    try {
+      slopeCanvas.releasePointerCapture(ev.pointerId);
+    } catch (e) {}
+  });
+
+  // initial draw and resize observer
+  const ro = new ResizeObserver(() => draw());
+  ro.observe(slopeCanvas);
+  draw();
 }
 
 function updateMixerUI() {
