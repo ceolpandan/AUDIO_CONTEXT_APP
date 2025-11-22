@@ -302,7 +302,7 @@ function init(playbackStartTimeRefGetter) {
     });
   }
 
-  // Play/Stop are handled by the application bootstrap (app2.js).
+  // Play/Stop are handled by the application bootstrap (app.js).
 }
 
 export { init, renderTrackUI, renderMixer, updateMixerUI, startUI, stopUI };
