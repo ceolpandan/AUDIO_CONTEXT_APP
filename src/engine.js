@@ -25,6 +25,9 @@ class Track {
 
     this.volume = 0.8;
     this.filterFreq = 2000;
+    // filter type and resonance (Q)
+    this.filterType = "lowpass";
+    this.filterQ = 1;
 
     this.gainNode = context.createGain();
     // route track outputs into the master bus
@@ -60,8 +63,9 @@ class Track {
       src.buffer = this.buffer;
 
       const filter = this.context.createBiquadFilter();
-      filter.type = "lowpass";
+      filter.type = merged.filterType || "lowpass";
       filter.frequency.value = merged.filterFreq;
+      if (typeof merged.filterQ === "number") filter.Q.value = merged.filterQ;
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);
@@ -80,8 +84,12 @@ class Track {
       osc.frequency.setValueAtTime(baseFreq, time);
 
       const filter = this.context.createBiquadFilter();
-      filter.type = "lowpass";
+      filter.type = merged.filterType || "lowpass";
       filter.frequency.setValueAtTime(merged.filterFreq, time);
+      try {
+        if (typeof merged.filterQ === "number")
+          filter.Q.setValueAtTime(merged.filterQ, time);
+      } catch (e) {}
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);

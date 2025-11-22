@@ -274,6 +274,7 @@ function renderMixer() {
         if (trackScreen) trackScreen.classList.remove("collapsed");
         selectedTrack = i;
         renderTrackUI(selectedTrack);
+        renderFilterUI(selectedTrack);
       }
       updateMixerUI();
     });
@@ -283,6 +284,92 @@ function renderMixer() {
 
   mixerRoot.appendChild(grid);
   updateMixerUI();
+}
+
+// Render filter controls for the selected track into the right-side filter panel
+function renderFilterUI(trackIndex) {
+  const panel = document.getElementById("filter");
+  if (!panel) return;
+  const track = tracks[trackIndex];
+  panel.innerHTML = "";
+
+  const title = document.createElement("h3");
+  title.textContent = `Filter — Track ${trackIndex + 1}`;
+  panel.appendChild(title);
+
+  const sampleLabel = document.createElement("div");
+  sampleLabel.className = "filter-note";
+  sampleLabel.textContent = track.sampleUrl
+    ? track.sampleUrl.replace(/^.*\//, "")
+    : "—";
+  panel.appendChild(sampleLabel);
+
+  // Filter type
+  const rowType = document.createElement("div");
+  rowType.className = "filter-row";
+  const lblType = document.createElement("label");
+  lblType.textContent = "Type";
+  const sel = document.createElement("select");
+  sel.className = "control";
+  ["lowpass", "highpass", "bandpass", "notch", "allpass", "peaking"].forEach(
+    (t) => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      if (t === track.filterType) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  );
+  sel.addEventListener("change", () => {
+    track.filterType = sel.value;
+  });
+  rowType.appendChild(lblType);
+  rowType.appendChild(sel);
+  panel.appendChild(rowType);
+
+  // Frequency
+  const rowFreq = document.createElement("div");
+  rowFreq.className = "filter-row";
+  const lblFreq = document.createElement("label");
+  lblFreq.textContent = "Freq";
+  const freq = document.createElement("input");
+  freq.type = "range";
+  freq.min = "20";
+  freq.max = "12000";
+  freq.step = "1";
+  freq.value = String(track.filterFreq || 2000);
+  freq.className = "control";
+  freq.addEventListener("input", () => {
+    track.filterFreq = Number(freq.value);
+  });
+  rowFreq.appendChild(lblFreq);
+  rowFreq.appendChild(freq);
+  panel.appendChild(rowFreq);
+
+  // Resonance (Q)
+  const rowQ = document.createElement("div");
+  rowQ.className = "filter-row";
+  const lblQ = document.createElement("label");
+  lblQ.textContent = "Res";
+  const q = document.createElement("input");
+  q.type = "range";
+  q.min = "0.1";
+  q.max = "20";
+  q.step = "0.1";
+  q.value = String(track.filterQ || 1);
+  q.className = "control";
+  q.addEventListener("input", () => {
+    track.filterQ = Number(q.value);
+  });
+  rowQ.appendChild(lblQ);
+  rowQ.appendChild(q);
+  panel.appendChild(rowQ);
+
+  // hint
+  const hint = document.createElement("div");
+  hint.className = "filter-note";
+  hint.textContent = "Changes affect subsequent triggers.";
+  panel.appendChild(hint);
 }
 
 function updateMixerUI() {
@@ -324,16 +411,19 @@ function init(playbackStartTimeRefGetter) {
 
     renderTrackUI(selectedTrack);
     renderMixer();
+    renderFilterUI(selectedTrack);
 
     document.getElementById("prev-track").addEventListener("click", () => {
       selectedTrack = (selectedTrack - 1 + TRACK_COUNT) % TRACK_COUNT;
       renderTrackUI(selectedTrack);
       updateMixerUI();
+      renderFilterUI(selectedTrack);
     });
     document.getElementById("next-track").addEventListener("click", () => {
       selectedTrack = (selectedTrack + 1) % TRACK_COUNT;
       renderTrackUI(selectedTrack);
       updateMixerUI();
+      renderFilterUI(selectedTrack);
     });
   }
 
@@ -371,6 +461,7 @@ function init(playbackStartTimeRefGetter) {
         if (trackScreen) trackScreen.classList.remove("collapsed");
         selectedTrack = idx;
         renderTrackUI(selectedTrack);
+        renderFilterUI(selectedTrack);
       }
       updateMixerUI();
     } catch (err) {

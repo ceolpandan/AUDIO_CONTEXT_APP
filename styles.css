@@ -311,6 +311,50 @@
   flex: 1 1 auto;
 }
 
+/* Filter panel on the right of sequencer */
+.filter-panel {
+  width: 280px;
+  min-width: 220px;
+  background: linear-gradient(180deg, #0f1412, #0b0d0b);
+  border-radius: var(--r-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-soft);
+  color: var(--fg);
+  font-size: var(--text-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.filter-panel .filter-placeholder {
+  color: var(--muted);
+}
+.filter-panel h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.filter-row {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.filter-row label {
+  flex: 0 0 70px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.filter-row .control {
+  flex: 1 1 auto;
+}
+.filter-panel select,
+.filter-panel input[type="range"] {
+  width: 100%;
+}
+.filter-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 .channel {
   background: var(--panel);
   border-radius: var(--r-sm);
