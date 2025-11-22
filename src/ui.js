@@ -6,11 +6,17 @@ import {
   updateMixerGains,
   setBpm,
   getBpm,
+  getAnalyser,
 } from "./engine.js";
 
 let uiRaf = null;
 let lastUiStep = -1;
 let selectedTrack = 0;
+let scopeRaf = null;
+let scopeCanvas = null;
+let scopeCtx = null;
+let analyserNode = null;
+let scopeData = null;
 
 function startUI(playbackStartTimeRef) {
   if (uiRaf) cancelAnimationFrame(uiRaf);
@@ -19,6 +25,7 @@ function startUI(playbackStartTimeRef) {
     uiRaf = requestAnimationFrame(frame);
   }
   uiRaf = requestAnimationFrame(frame);
+  startScope();
 }
 
 function stopUI() {
@@ -28,6 +35,62 @@ function stopUI() {
     .querySelectorAll(".step--playhead")
     .forEach((el) => el.classList.remove("step--playhead"));
   lastUiStep = -1;
+  stopScope();
+}
+
+function initScopeCanvas() {
+  scopeCanvas = document.getElementById("scope-canvas");
+  if (!scopeCanvas) return false;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = scopeCanvas.getBoundingClientRect();
+  scopeCanvas.width = Math.max(300, rect.width * dpr);
+  scopeCanvas.height = Math.max(120, rect.height * dpr);
+  scopeCtx = scopeCanvas.getContext("2d");
+  scopeCtx.scale(dpr, dpr);
+  analyserNode = getAnalyser();
+  if (!analyserNode) return false;
+  const size = analyserNode.fftSize || 2048;
+  scopeData = new Uint8Array(size);
+  return true;
+}
+
+function drawScope() {
+  if (!scopeCtx || !analyserNode) return;
+  const rect = scopeCanvas.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
+  analyserNode.getByteTimeDomainData(scopeData);
+
+  scopeCtx.clearRect(0, 0, w, h);
+  // background
+  scopeCtx.fillStyle = "rgba(0,0,0,0.02)";
+  scopeCtx.fillRect(0, 0, w, h);
+
+  scopeCtx.lineWidth = 2;
+  scopeCtx.strokeStyle = "hsl(160 80% 60%)";
+  scopeCtx.beginPath();
+  const step = scopeData.length / w;
+  for (let x = 0; x < w; x++) {
+    const idx = Math.floor(x * step);
+    const v = scopeData[idx] / 128.0 - 1.0;
+    const y = h / 2 + v * (h / 2) * 0.9;
+    if (x === 0) scopeCtx.moveTo(x, y);
+    else scopeCtx.lineTo(x, y);
+  }
+  scopeCtx.stroke();
+
+  scopeRaf = requestAnimationFrame(drawScope);
+}
+
+function startScope() {
+  if (scopeRaf) return;
+  if (!initScopeCanvas()) return;
+  drawScope();
+}
+
+function stopScope() {
+  if (scopeRaf) cancelAnimationFrame(scopeRaf);
+  scopeRaf = null;
 }
 
 function updatePlayhead(playbackStartTimeRef) {

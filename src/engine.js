@@ -1,6 +1,14 @@
 // Audio engine: audio context, Track, scheduling, and helper APIs
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+// Master output chain (master gain -> analyser -> destination)
+const masterGain = audioCtx.createGain();
+masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = 2048;
+masterGain.connect(analyser);
+analyser.connect(audioCtx.destination);
+
 class Track {
   constructor(context, sampleUrl, index = 0) {
     this.context = context;
@@ -19,7 +27,8 @@ class Track {
     this.filterFreq = 2000;
 
     this.gainNode = context.createGain();
-    this.gainNode.connect(context.destination);
+    // route track outputs into the master bus
+    this.gainNode.connect(masterGain);
     // Channel fader level (0..1) — separate from per-hit envelope volume
     this.level = 1;
     this.gainNode.gain.setValueAtTime(this.level, this.context.currentTime);
@@ -169,6 +178,10 @@ function updateMixerGains() {
   });
 }
 
+function getAnalyser() {
+  return analyser;
+}
+
 function setTrackLevel(index, value, ramp = 0.03) {
   const t = tracks[index];
   if (!t) return;
@@ -212,5 +225,6 @@ export {
   updateMixerGains,
   setTrackLevel,
   setBpm,
+  getAnalyser,
   getBpm,
 };

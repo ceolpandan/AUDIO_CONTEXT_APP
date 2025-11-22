@@ -269,6 +269,40 @@
   gap: var(--space-sm);
 }
 
+/* Layout: main row with scope on the left and sequencer on the right */
+.main-row {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+}
+.scope {
+  width: 260px;
+  min-width: 200px;
+  background: linear-gradient(180deg, #0f1412, #0b0d0b);
+  border-radius: var(--r-md);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scope canvas {
+  width: 100%;
+  height: 140px;
+  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.12)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+/* Make sure the tracks area grows to fill remaining space */
+.tracks {
+  flex: 1 1 auto;
+}
+
 .channel {
   background: var(--panel);
   border-radius: var(--r-sm);
