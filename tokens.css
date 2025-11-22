@@ -1,0 +1,49 @@
+/* Design tokens (colors, spacing, radii, shadows, typography) */
+:root {
+  /* Colors */
+  --bg-1: #000;
+  --bg-2: #111;
+  --panel: #222;
+  --muted: #aaa;
+  --fg: #eee;
+  --accent: #0aa06f;
+  --danger: #b50b3b;
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.5rem;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 4px 12px rgba(10, 160, 111, 0.6);
+
+  /* Typography */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --text-sm: 0.85rem;
+}
+
+/* Reset + base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: var(--font-ui);
+  color: var(--fg);
+  background: radial-gradient(circle at top, #222 0, #111 40%, var(--bg-1) 100%);
+  -webkit-font-smoothing: antialiased;
+}
