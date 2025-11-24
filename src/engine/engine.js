@@ -7,12 +7,11 @@ import {
   LOOKAHEAD,
   STEPS_PER_BEAT,
   DEFAULT_FILTER_FREQ,
-  DEFAULT_FILTER_Q,
   DEFAULT_VOLUME,
 } from '../config/constants.js';
 
 // Audio engine: audio context, Track, scheduling, and helper APIs
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const audioCtx = new (globalThis.AudioContext || globalThis.webkitAudioContext)();
 
 // Master output chain (master gain -> analyser -> destination)
 const masterGain = audioCtx.createGain();
@@ -30,12 +29,10 @@ class Track {
     this.index = index;
     this.buffer = null;
 
-    this.pattern = Array(STEPS)
-      .fill(null)
-      .map(() => ({
-        trig: false,
-        locks: {},
-      }));
+    this.pattern = new Array(STEPS).fill(null).map(() => ({
+      trig: false,
+      locks: {},
+    }));
 
     this.volume = DEFAULT_VOLUME;
     this.filterFreq = DEFAULT_FILTER_FREQ;
@@ -102,7 +99,9 @@ class Track {
       filter.frequency.setValueAtTime(merged.filterFreq, time);
       try {
         if (typeof merged.filterQ === 'number') filter.Q.setValueAtTime(merged.filterQ, time);
-      } catch (e) {}
+      } catch (e) {
+        console.log(`Exception while doing something: ${e.message}`);
+      }
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);
@@ -137,7 +136,7 @@ let tracks = [];
 function scheduleStep(stepIndex, time) {
   tracks.forEach((track) => {
     const step = track.pattern[stepIndex];
-    if (!step || !step.trig) return;
+    if (!step?.trig) return;
 
     // notify UI that this track will trigger (UI can use this to flash mixers etc.)
     try {
@@ -149,7 +148,7 @@ function scheduleStep(stepIndex, time) {
         );
       }
     } catch (e) {
-      // ignore (non-DOM environments)
+      console.log(`Exception while doing something: ${e.message}`);
     }
 
     track.trigger(time, step.locks);
@@ -169,8 +168,6 @@ function scheduler() {
   requestAnimationFrame(scheduler);
 }
 
-let playbackStartTime = 0;
-
 async function start() {
   if (audioCtx.state === 'suspended') {
     await audioCtx.resume();
@@ -178,7 +175,6 @@ async function start() {
   isPlaying = true;
   currentStep = 0;
   nextEventTime = audioCtx.currentTime;
-  playbackStartTime = audioCtx.currentTime;
   scheduler();
 }
 
@@ -204,7 +200,7 @@ function updateMixerGains() {
       // multiply channel level by mute/solo state
       t.gainNode.gain.setValueAtTime(t.level * val, now);
     } catch (e) {
-      // ignore
+      console.log(`Exception while doing something: ${e.message}`);
     }
   });
 }

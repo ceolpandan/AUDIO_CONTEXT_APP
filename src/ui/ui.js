@@ -101,7 +101,7 @@ function stopScope() {
 
 function updatePlayhead(playbackStartTimeRef) {
   const playbackStartTime = playbackStartTimeRef();
-  if (playbackStartTime == null) return;
+  if (playbackStartTime === null) return;
   const elapsed = audioCtx.currentTime - playbackStartTime;
   const dur = 1 / ((getBpm() / 60) * 4);
   if (dur <= 0) return;
@@ -265,12 +265,11 @@ function renderMixer() {
       ) {
         return;
       }
-      // Toggle sequencer visibility when clicking the same channel;
-      // otherwise select and show the sequencer for the clicked channel.
+      // select and show the sequencer for the clicked channel.
       const trackScreen = document.querySelector('.track-screen');
       const wasSelected = selectedTrack === i;
       if (wasSelected && trackScreen) {
-        trackScreen.classList.toggle('collapsed');
+        return; //TO DO: play track
       } else {
         if (trackScreen) trackScreen.classList.remove('collapsed');
         selectedTrack = i;
@@ -663,7 +662,9 @@ function init(playbackStartTimeRefGetter) {
 
       const trackScreen = document.querySelector('.track-screen');
       if (selectedTrack === idx) {
-        if (trackScreen) trackScreen.classList.toggle('collapsed');
+        if (trackScreen) {
+          return; //TO DO: play track
+        }
       } else {
         if (trackScreen) trackScreen.classList.remove('collapsed');
         selectedTrack = idx;
