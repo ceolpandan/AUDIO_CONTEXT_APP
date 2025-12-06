@@ -83,11 +83,15 @@ async function build() {
   }
 
   // Copy static assets
-  const assets = ['styles.css', 'tokens.css', 'utilities.css', 'README.md'];
-  for (const a of assets) {
+  const rootAssets = ['README.md'];
+  for (const a of rootAssets) {
     const src = path.join(root, a);
     if (fs.existsSync(src)) copyFile(src, path.join(dist, a));
   }
+
+  // Copy styles directory
+  const stylesDir = path.join(root, 'styles');
+  if (fs.existsSync(stylesDir)) copyDir(stylesDir, path.join(dist, 'styles'));
 
   // Copy samples (if present)
   const samples = path.join(root, 'samples');

@@ -10,13 +10,13 @@ A modular web-audio step sequencer (mini drum-machine) built with vanilla JavaSc
 
 ### Running the App
 ```cmd
-node dev-server.js
+npm run dev
 ```
 or
 ```cmd
-npm run dev
+npm start
 ```
-Visit `http://localhost:3000`. The dev server includes SSE-based live reload.
+Both commands run `node scripts/dev-server.js`. Visit `http://localhost:3000`. The dev server includes SSE-based live reload.
 
 **Windows-specific:** Use `cmd.exe` instead of PowerShell to avoid script execution policy issues.
 
@@ -79,17 +79,34 @@ All application-level constants live in `src/config/constants.js`:
 
 Adjust these for global changes rather than hardcoding values.
 
-### Module Organization
+### Project Structure
 
-- `app.js`: Bootstrap — loads engine + UI, applies preset pattern, wires Play/Stop buttons
-- `src/engine/engine.js`: Canonical audio engine implementation
-- `src/engine.js`: Lightweight shim re-exporting `src/engine/engine.js`
-- `src/ui/ui.js`: Canonical UI implementation
-- `src/ui.js`: Lightweight shim re-exporting `src/ui/ui.js`
-- `src/ui/*/index.js`: Small compatibility shims for UI submodules
-- `src/config/constants.js`: Centralized constants
+```
+AUDIO_CONTEXT_APP/
+├── index.html              # HTML entry point
+├── app.js                  # Application bootstrap
+├── src/                    # Application source code
+│   ├── engine.js           # Re-exports from engine/engine.js
+│   ├── ui.js               # Re-exports from ui/ui.js
+│   ├── config/
+│   │   └── constants.js    # Application constants
+│   ├── engine/
+│   │   └── engine.js       # Audio engine implementation
+│   └── ui/
+│       └── ui.js           # UI implementation
+├── styles/                 # CSS files
+│   ├── tokens.css          # Design tokens (colors, spacing)
+│   ├── utilities.css       # Utility classes
+│   └── styles.css          # Component styles
+├── samples/                # Audio sample files (.wav, .mp3)
+├── scripts/                # Build and development scripts
+│   ├── build-esbuild.js    # Production build script
+│   ├── dev-server.js       # Development server with live reload
+│   └── livereload.js       # Live reload client script
+└── dist/                   # Build output (generated)
+```
 
-**Shim pattern:** The project uses `index.js` or top-level shims for backwards compatibility. Canonical implementations are in `engine/engine.js` and `ui/ui.js`. Prefer editing the canonical files.
+**Import pattern:** `app.js` imports from `./src/engine.js` and `./src/ui.js`, which are lightweight shims that re-export from the actual implementation files. This allows the implementation code to live in organized subdirectories while keeping import paths simple.
 
 ## Adding Features
 
@@ -102,9 +119,12 @@ Adjust these for global changes rather than hardcoding values.
 
 ### Adding UI Components
 
-1. Create a new file in `src/ui/<component>.js` if needed
-2. Expose functions in `src/ui/ui.js`
-3. Keep small shims in `src/ui/<component>/index.js` only for compatibility
+Currently, all UI code lives in `src/ui/ui.js`. To add new UI functionality:
+
+1. Add the new functions directly to `src/ui/ui.js`
+2. Export them so they're available when importing from `src/ui.js`
+
+If the file grows too large, you can split it into separate files (e.g., `src/ui/mixer.js`, `src/ui/filter.js`) and import them into `src/ui/ui.js` to re-export.
 
 ### Visual Synchronization
 

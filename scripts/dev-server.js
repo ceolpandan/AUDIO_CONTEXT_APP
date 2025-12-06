@@ -2,8 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Serve files from the script directory to avoid depending on process.cwd()
-const root = path.resolve(__dirname);
+// Serve files from the project root (parent of scripts/)
+const root = path.resolve(__dirname, '..');
 const port = process.env.PORT || 3000;
 
 const clients = new Set();
