@@ -71,6 +71,8 @@ class Track {
     const merged = {
       volume: this.volume,
       filterFreq: this.filterFreq,
+      filterType: this.filterType,
+      filterQ: this.filterQ,
       ...params,
     };
 
