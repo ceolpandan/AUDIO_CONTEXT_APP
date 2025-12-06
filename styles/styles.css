@@ -376,17 +376,30 @@
     0 0 14px rgba(10, 160, 111, 0.08);
 }
 .filter-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
   gap: var(--space-sm);
   align-items: center;
+  margin-bottom: var(--space-sm);
 }
-.filter-row label {
-  flex: 0 0 70px;
+
+.filter-row > span:first-child {
   color: var(--muted);
   font-size: 0.85rem;
+  min-width: 40px;
 }
+
+.filter-value {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}
+
 .filter-row .control {
-  flex: 1 1 auto;
+  width: 100%;
 }
 .filter-panel select,
 .filter-panel input[type='range'] {
