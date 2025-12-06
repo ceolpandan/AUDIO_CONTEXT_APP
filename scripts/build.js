@@ -10,7 +10,7 @@ function rmrf(p) {
     fs.rmSync(p, { recursive: true, force: true });
     return;
   } catch (e) {
-    // ignore and fallback
+    // Fallback to manual recursion for older Node versions
   }
   const stat = fs.statSync(p);
   if (stat.isDirectory()) {
@@ -59,14 +59,7 @@ function build() {
   rmrf(dist);
   mkdirp(dist);
 
-  const topFiles = [
-    'index.html',
-    'README.md',
-    'styles.css',
-    'tokens.css',
-    'utilities.css',
-    'app.js',
-  ];
+  const topFiles = ['index.html', 'README.md', 'app.js'];
   for (const f of topFiles) {
     const src = path.join(root, f);
     const dst = path.join(dist, f);
@@ -82,6 +75,9 @@ function build() {
 
   const srcDir = path.join(root, 'src');
   if (fs.existsSync(srcDir)) copyDir(srcDir, path.join(dist, 'src'), { exclude: ['__tests__'] });
+
+  const stylesDir = path.join(root, 'styles');
+  if (fs.existsSync(stylesDir)) copyDir(stylesDir, path.join(dist, 'styles'));
 
   const samples = path.join(root, 'samples');
   if (fs.existsSync(samples)) copyDir(samples, path.join(dist, 'samples'));

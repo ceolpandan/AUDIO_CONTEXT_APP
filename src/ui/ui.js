@@ -165,9 +165,14 @@ function renderTrackUI(trackIndex) {
   // No per-track knobs in the sequencer view — the sequencer only displays triggers.
   if (info) {
     const sampleLabel = track.sampleUrl ? track.sampleUrl.replace(/^.*\//, '') : '—';
-    info.innerHTML = `<span class="meta">Track ${
-      trackIndex + 1
-    }</span><span>Sample: ${sampleLabel}</span>`;
+    info.innerHTML = '';
+    const metaSpan = document.createElement('span');
+    metaSpan.className = 'meta';
+    metaSpan.textContent = `Track ${trackIndex + 1}`;
+    const sampleSpan = document.createElement('span');
+    sampleSpan.textContent = `Sample: ${sampleLabel}`;
+    info.appendChild(metaSpan);
+    info.appendChild(sampleSpan);
   }
 }
 
@@ -249,7 +254,9 @@ function renderMixer() {
       } catch (e) {
         try {
           t.gainNode.gain.setValueAtTime(v, now);
-        } catch (e2) {}
+        } catch (e2) {
+          // Ignore - AudioContext may be in invalid state
+        }
       }
       t.level = v;
     });
@@ -409,12 +416,6 @@ function renderFilterUI(trackIndex) {
 
   // --- drawing helpers ---
   const dpr = window.devicePixelRatio || 1;
-  function resizeCanvas() {
-    const rect = slopeCanvas.getBoundingClientRect();
-    slopeCanvas.width = Math.max(300, rect.width * dpr);
-    slopeCanvas.height = Math.max(120, rect.height * dpr);
-    slopeCanvas.getContext('2d').scale(dpr, dpr);
-  }
 
   function freqToX(f) {
     const rect = slopeCanvas.getBoundingClientRect();
@@ -575,7 +576,9 @@ function renderFilterUI(trackIndex) {
     dragging = false;
     try {
       slopeCanvas.releasePointerCapture(ev.pointerId);
-    } catch (e) {}
+    } catch (e) {
+      // Ignore - pointer capture may not be active
+    }
   });
 
   // initial draw and resize observer

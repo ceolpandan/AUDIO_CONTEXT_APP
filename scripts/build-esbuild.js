@@ -11,7 +11,7 @@ function rmrf(p) {
     fs.rmSync(p, { recursive: true, force: true });
     return;
   } catch (e) {
-    // fallback
+    // Fallback to manual recursion for older Node versions
   }
   const stat = fs.statSync(p);
   if (stat.isDirectory()) {

@@ -8,6 +8,11 @@ import {
   STEPS_PER_BEAT,
   DEFAULT_FILTER_FREQ,
   DEFAULT_VOLUME,
+  OSC_BASE_FREQ,
+  OSC_FREQ_STEP,
+  OSC_ATTACK_TIME,
+  OSC_RELEASE_TIME,
+  OSC_TOTAL_DURATION,
 } from '../config/constants.js';
 
 // Audio engine: audio context, Track, scheduling, and helper APIs
@@ -90,7 +95,7 @@ class Track {
     } else {
       // Oscillator fallback
       const osc = this.context.createOscillator();
-      const baseFreq = 200 + (this.index % 8) * 60;
+      const baseFreq = OSC_BASE_FREQ + (this.index % TRACK_COUNT) * OSC_FREQ_STEP;
       osc.type = 'square';
       osc.frequency.setValueAtTime(baseFreq, time);
 
@@ -100,20 +105,20 @@ class Track {
       try {
         if (typeof merged.filterQ === 'number') filter.Q.setValueAtTime(merged.filterQ, time);
       } catch (e) {
-        console.log(`Exception while doing something: ${e.message}`);
+        console.warn(`Filter Q setting failed: ${e.message}`);
       }
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);
-      env.gain.linearRampToValueAtTime(merged.volume, time + 0.02);
-      env.gain.linearRampToValueAtTime(0, time + 0.18);
+      env.gain.linearRampToValueAtTime(merged.volume, time + OSC_ATTACK_TIME);
+      env.gain.linearRampToValueAtTime(0, time + OSC_RELEASE_TIME);
 
       osc.connect(filter);
       filter.connect(env);
       env.connect(this.gainNode);
 
       osc.start(time);
-      osc.stop(time + 0.2);
+      osc.stop(time + OSC_TOTAL_DURATION);
     }
   }
 }

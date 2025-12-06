@@ -1,10 +1,12 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // Serve files from the project root (parent of scripts/)
 const root = path.resolve(__dirname, '..');
-const port = process.env.PORT || 3000;
+const DEFAULT_PORT = 3000;
+const DEBOUNCE_MS = 100;
+const port = process.env.PORT || DEFAULT_PORT;
 
 const clients = new Set();
 
@@ -119,7 +121,7 @@ function broadcastReload() {
       res.write('event: reload\n');
       res.write('data: reload\n\n');
     } catch (e) {
-      // ignore
+      // Ignore - client connection may have closed
     }
   }
 }
@@ -137,7 +139,7 @@ try {
     debounceTimer = setTimeout(() => {
       console.log('File change detected:', f);
       broadcastReload();
-    }, 100);
+    }, DEBOUNCE_MS);
   });
   console.log('Watching files for changes...');
 } catch (e) {

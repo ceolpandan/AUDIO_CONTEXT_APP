@@ -34,6 +34,18 @@ npm run format      # Format all files with Prettier
 npm run format:check # Check formatting without changes
 ```
 
+### Code Quality
+The project is configured for SonarQube analysis via `sonar-project.properties`. To run SonarQube locally:
+```cmd
+sonar-scanner
+```
+
+**Code quality practices:**
+- All magic numbers are extracted to constants in `src/config/constants.js`
+- Security: innerHTML usage minimized; dynamic content uses textContent
+- Empty catch blocks include explanatory comments
+- ESLint rules enforced for consistency
+
 ### Troubleshooting Port Conflicts (Windows)
 If `EADDRINUSE` error occurs on port 3000:
 ```cmd
