@@ -11,17 +11,16 @@ A compact, modular web-audio step sequencer (mini drum-machine) built with nativ
 
 - **Requirements:**: Node.js (>=12) for the dev server and a modern browser for the Web Audio API.
 - **Run dev server (recommended):**
-  - From a Windows `cmd.exe` shell (recommended to avoid PowerShell script policy issues):
-
-    ```cmd
-    cd C:\Users\stilo\AUDIO_CONTEXT_APP
-    node dev-server.js
-    ```
-
-  - Or via npm (if `package.json` has a script):
+  - Via npm (recommended):
 
     ```cmd
     npm run dev
+    ```
+
+  - Or directly:
+
+    ```cmd
+    node scripts/dev-server.js
     ```
 
 - **Open:**: Visit `http://localhost:3000` in your browser. The page auto-connects to the live-reload client injected in `index.html`.
@@ -30,11 +29,13 @@ A compact, modular web-audio step sequencer (mini drum-machine) built with nativ
 
 - **`index.html`**: The HTML entry (loads `app.js`).
 - **`app.js`**: Application bootstrap — wires engine + UI, presets, and Play/Stop controls.
-- **`dev-server.js`**: Tiny Node dev server with SSE live-reload (`/events`) and static serving.
-- **`livereload.js`**: Client that listens for SSE reload events and refreshes the page.
 - **`package.json`**: Minimal project metadata and scripts (e.g., `dev`).
-- **`styles.css`, `tokens.css`, `utilities.css`**: CSS layer (tokens, utilities, components).
+- **`styles/`**: CSS files (tokens, utilities, components).
 - **`samples/`**: (Expected) folder for audio sample WAV/MP3 files used by tracks.
+- **`scripts/`**: Build and development scripts:
+  - **`scripts/dev-server.js`**: Tiny Node dev server with SSE live-reload (`/events`) and static serving.
+  - **`scripts/livereload.js`**: Client that listens for SSE reload events and refreshes the page.
+  - **`scripts/build-esbuild.js`**: Production build script.
 - **`src/`**: Application source (modular):
   - **`src/config/constants.js`**: Canonical app-level constants (BPM, steps, FFT size, defaults).
   - **`src/engine/engine.js`**: Audio engine implementation (AudioContext, Track class, scheduler, mixer helpers).
