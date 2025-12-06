@@ -1,7 +1,7 @@
 // Simple client for SSE-based livereload server
 (function () {
   if (typeof EventSource === 'undefined') return;
-  var es = new EventSource('/events');
+  const es = new EventSource('/events');
   es.addEventListener('reload', function (ev) {
     try {
       console.log('[livereload] reload event received');
