@@ -1,11 +1,23 @@
-# Audio Context App
+# Digitick
 
-A compact, modular web-audio step sequencer (mini drum-machine) built with native ES modules and the Web Audio API. This README explains the project layout, how the engine and UI interact, how to run the app in development, and where to extend functionality.
+A web-based drum machine inspired by the Elektron Digitakt, built with vanilla JavaScript ES modules and the Web Audio API.
 
-**Overview**
+## About This Project
 
-- **Purpose:**: Small, extendable web-audio application demonstrating an audio engine (scheduler + mixer) and a DOM-driven UI (sequencer, mixer, filter, oscilloscope).
-- **Stack:**: Vanilla JavaScript (ES modules), Web Audio API, DOM APIs, basic Node dev server for livereload.
+**Digitick** is a personal learning project with multiple objectives:
+
+- 💼 **Resume Building**: A portfolio piece demonstrating modern JavaScript development skills
+- 📚 **Deep Learning**: Hands-on experience with ES modules, Web Audio API, and browser capabilities
+- 🤖 **AI-Assisted Development**: Exploring effective collaboration with AI tools in software development
+- 🎵 **Feature Implementation**: Progressively replicating Digitakt features (step sequencer, parameter locks, per-track filters, etc.)
+
+The project started from a desire to recreate the beloved Elektron Digitakt drum machine for the web, making electronic music production tools accessible through the browser.
+
+**Technical Overview**
+
+- **Purpose**: Modular web-audio application with clean separation between audio engine and UI
+- **Stack**: Vanilla JavaScript (ES modules), Web Audio API, DOM APIs, Node.js dev server with live reload
+- **Architecture**: Engine handles all audio (scheduling, mixing, sample playback); UI handles all DOM rendering and user interaction
 
 **Quick Start**
 
