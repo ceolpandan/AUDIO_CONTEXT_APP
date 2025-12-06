@@ -1,5 +1,5 @@
 {
-  "name": "audio-context-app",
+  "name": "digitick",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
     "build": "node scripts/build-esbuild.js",
     "format:check": "prettier --check ."
   },
-  "description": "Tiny dev server for live-reload during development",
+  "description": "Digitick - A web-based drum machine inspired by the Elektron Digitakt",
   "engines": {
     "node": ">=12"
   },

@@ -4,7 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A modular web-audio step sequencer (mini drum-machine) built with vanilla JavaScript ES modules and the Web Audio API. The architecture strictly separates audio engine logic from DOM/UI rendering.
+**Digitick** - A web-based drum machine inspired by the Elektron Digitakt, built with vanilla JavaScript ES modules and the Web Audio API.
+
+### Project Intent
+
+This is a personal learning project with the following goals:
+- **Portfolio piece**: Demonstrating full-stack JavaScript development skills for resume building
+- **Deep JavaScript learning**: Understanding ES modules, Web Audio API, and modern browser APIs
+- **AI-assisted development**: Learning to effectively collaborate with AI tools for software development
+- **Feature implementation**: Progressively implementing Digitakt-inspired features (step sequencer, parameter locks, filters, etc.)
+
+The architecture strictly separates audio engine logic from DOM/UI rendering, making it easy to extend with new features.
 
 ## Development Commands
 
@@ -91,10 +101,22 @@ All application-level constants live in `src/config/constants.js`:
 
 Adjust these for global changes rather than hardcoding values.
 
+## Future Development Roadmap
+
+As this project aims to replicate Digitakt features, planned implementations include:
+- **Parameter locks**: Per-step parameter automation (pitch, filter, volume, etc.)
+- **Conditional trigs**: Probability, fill conditions, retrigs
+- **Sound design**: Advanced filter controls, LFO, envelope controls
+- **Pattern management**: Multiple patterns, pattern chaining
+- **Sample management**: Sample browser, waveform display, slice editing
+- **MIDI support**: MIDI input/output for external gear integration
+- **Effects**: Reverb, delay, compression per track
+- **Song mode**: Arranging patterns into complete tracks
+
 ### Project Structure
 
 ```
-AUDIO_CONTEXT_APP/
+Digitick/
 ├── index.html              # HTML entry point
 ├── app.js                  # Application bootstrap
 ├── src/                    # Application source code
