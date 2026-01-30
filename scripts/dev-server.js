@@ -58,7 +58,9 @@ function serveFile(reqPath, res) {
       // try index.html
       const indexPath = path.join(resolvedFile, 'index.html');
       fs.stat(indexPath, (err2, stats2) => {
-        if (err2 || !stats2.isFile()) return send404(res);
+        if (err2 || !stats2.isFile()) {
+          return send404(res);
+        }
         streamFile(indexPath, res);
       });
     } else if (stats.isFile()) {
@@ -107,7 +109,9 @@ const server = http.createServer((req, res) => {
 
   // serve static
   let p = url;
-  if (p === '/') p = '/index.html';
+  if (p === '/') {
+    p = '/index.html';
+  }
   const filePath = path.join(root, p);
   serveFile(filePath, res);
 });
@@ -120,7 +124,7 @@ function broadcastReload() {
     try {
       res.write('event: reload\n');
       res.write('data: reload\n\n');
-    } catch (e) {
+    } catch (_e) {
       // Ignore - client connection may have closed
     }
   }
@@ -128,21 +132,29 @@ function broadcastReload() {
 
 // Watch for file changes in the project root
 try {
-  fs.watch(root, { recursive: true }, (evt, filename) => {
-    if (!filename) return;
+  fs.watch(root, { recursive: true }, (_evt, filename) => {
+    if (!filename) {
+      return;
+    }
     const f = filename.toString();
     // ignore some dirs
-    for (const ig of ignored) if (f.includes(ig)) return;
+    for (const ig of ignored) {
+      if (f.includes(ig)) {
+        return;
+      }
+    }
 
     // debounce bursts
-    if (debounceTimer) clearTimeout(debounceTimer);
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
     debounceTimer = setTimeout(() => {
       console.log('File change detected:', f);
       broadcastReload();
     }, DEBOUNCE_MS);
   });
   console.log('Watching files for changes...');
-} catch (e) {
+} catch (_e) {
   console.warn(
     'fs.watch may not support recursive on this platform. If changes are not detected, consider using chokidar and `npm i chokidar`.'
   );

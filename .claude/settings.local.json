@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run lint:ci:*)"
+      "Bash(npm run lint:ci:*)",
+      "Bash(npm install)",
+      "Bash(npm run check:ci:*)",
+      "Bash(npm run check:*)",
+      "Bash(npx biome check:*)"
     ],
     "deny": [],
     "ask": []

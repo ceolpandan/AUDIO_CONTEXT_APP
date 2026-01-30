@@ -1,15 +1,15 @@
+import { STEPS } from './src/config/constants.js';
 // New app entry point. Boots engine + UI modules.
 import {
   audioCtx,
   createTracksFromUrls,
-  tracks,
   start as engineStart,
   stop as engineStop,
-  updateMixerGains,
   setBpm,
+  tracks,
+  updateMixerGains,
 } from './src/engine.js';
-import { init as uiInit, updateMixerUI, startUI, stopUI } from './src/ui.js';
-import { STEPS } from './src/config/constants.js';
+import { startUI, stopUI, init as uiInit, updateMixerUI } from './src/ui.js';
 
 let playbackStartTime = null;
 
@@ -39,58 +39,96 @@ async function boot() {
 
     // Kick (punchy hiphop pattern)
     [0, 3, 7, 10, 12].forEach((s) => {
-      if (tracks[0] && tracks[0].pattern[s]) tracks[0].pattern[s].trig = true;
+      if (tracks[0]?.pattern[s]) {
+        tracks[0].pattern[s].trig = true;
+      }
     });
 
     // Snare on backbeat
     [4, 12].forEach((s) => {
-      if (tracks[1] && tracks[1].pattern[s]) tracks[1].pattern[s].trig = true;
+      if (tracks[1]?.pattern[s]) {
+        tracks[1].pattern[s].trig = true;
+      }
     });
 
     // Closed hats: steady 8th notes (every 2 steps)
     for (let s = 0; s < STEPS; s += 2) {
-      if (tracks[2] && tracks[2].pattern[s]) tracks[2].pattern[s].trig = true;
+      if (tracks[2]?.pattern[s]) {
+        tracks[2].pattern[s].trig = true;
+      }
     }
 
     // Open hat accents
     [6, 14].forEach((s) => {
-      if (tracks[3] && tracks[3].pattern[s]) tracks[3].pattern[s].trig = true;
+      if (tracks[3]?.pattern[s]) {
+        tracks[3].pattern[s].trig = true;
+      }
     });
 
     // Clap layered with snare for feel
     [4, 12].forEach((s) => {
-      if (tracks[4] && tracks[4].pattern[s]) tracks[4].pattern[s].trig = true;
+      if (tracks[4]?.pattern[s]) {
+        tracks[4].pattern[s].trig = true;
+      }
     });
 
     // Percussion: shuffled syncopation
     [2, 6, 11, 15].forEach((s) => {
-      if (tracks[5] && tracks[5].pattern[s]) tracks[5].pattern[s].trig = true;
+      if (tracks[5]?.pattern[s]) {
+        tracks[5].pattern[s].trig = true;
+      }
     });
 
     // Low percussion hits for groove
     [8, 14].forEach((s) => {
-      if (tracks[6] && tracks[6].pattern[s]) tracks[6].pattern[s].trig = true;
+      if (tracks[6]?.pattern[s]) {
+        tracks[6].pattern[s].trig = true;
+      }
     });
 
     // Flavor percussion
     [7, 13].forEach((s) => {
-      if (tracks[7] && tracks[7].pattern[s]) tracks[7].pattern[s].trig = true;
+      if (tracks[7]?.pattern[s]) {
+        tracks[7].pattern[s].trig = true;
+      }
     });
 
     // channel volumes
-    if (tracks[0]) tracks[0].volume = 1.0; // kick
-    if (tracks[1]) tracks[1].volume = 0.9; // snare
-    if (tracks[2]) tracks[2].volume = 0.55; // hats
-    if (tracks[3]) tracks[3].volume = 0.5; // open hat
-    if (tracks[4]) tracks[4].volume = 0.6; // clap
-    if (tracks[5]) tracks[5].volume = 0.6;
-    if (tracks[6]) tracks[6].volume = 0.5;
-    if (tracks[7]) tracks[7].volume = 0.45;
+    if (tracks[0]) {
+      tracks[0].volume = 1.0; // kick
+    }
+    if (tracks[1]) {
+      tracks[1].volume = 0.9; // snare
+    }
+    if (tracks[2]) {
+      tracks[2].volume = 0.55; // hats
+    }
+    if (tracks[3]) {
+      tracks[3].volume = 0.5; // open hat
+    }
+    if (tracks[4]) {
+      tracks[4].volume = 0.6; // clap
+    }
+    if (tracks[5]) {
+      tracks[5].volume = 0.6;
+    }
+    if (tracks[6]) {
+      tracks[6].volume = 0.5;
+    }
+    if (tracks[7]) {
+      tracks[7].volume = 0.45;
+    }
 
     // gentle filter tweaks for character
-    if (tracks[0]) tracks[0].filterFreq = 1800;
-    if (tracks[1]) tracks[1].filterFreq = 2200;
-    if (tracks[2]) tracks[2].filterFreq = 7000;
+    if (tracks[0]) {
+      tracks[0].filterFreq = 1800;
+    }
+    if (tracks[1]) {
+      tracks[1].filterFreq = 2200;
+    }
+    if (tracks[2]) {
+      tracks[2].filterFreq = 7000;
+    }
   }
 
   // initialise the UI; provide a getter for playback start time for playhead sync

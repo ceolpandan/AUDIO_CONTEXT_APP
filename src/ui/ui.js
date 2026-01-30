@@ -1,5 +1,5 @@
-import { audioCtx, tracks, updateMixerGains, setBpm, getBpm, getAnalyser } from '../engine.js';
 import { STEPS, TRACK_COUNT } from '../config/constants.js';
+import { audioCtx, getAnalyser, getBpm, setBpm, tracks, updateMixerGains } from '../engine.js';
 
 let uiRaf = null;
 let lastUiStep = -1;
@@ -17,15 +17,19 @@ if (typeof document !== 'undefined') {
   document.addEventListener('track-trigger', (e) => {
     try {
       const idx = e?.detail?.trackIndex;
-      if (typeof idx === 'number') flashChannel(idx);
-    } catch (err) {
+      if (typeof idx === 'number') {
+        flashChannel(idx);
+      }
+    } catch (_err) {
       /* ignore */
     }
   });
 }
 
 function startUI(playbackStartTimeRef) {
-  if (uiRaf) cancelAnimationFrame(uiRaf);
+  if (uiRaf) {
+    cancelAnimationFrame(uiRaf);
+  }
   function frame() {
     updatePlayhead(playbackStartTimeRef);
     uiRaf = requestAnimationFrame(frame);
@@ -35,7 +39,9 @@ function startUI(playbackStartTimeRef) {
 }
 
 function stopUI() {
-  if (uiRaf) cancelAnimationFrame(uiRaf);
+  if (uiRaf) {
+    cancelAnimationFrame(uiRaf);
+  }
   uiRaf = null;
   document
     .querySelectorAll('.step--playhead')
@@ -46,7 +52,9 @@ function stopUI() {
 
 function initScopeCanvas() {
   scopeCanvas = document.getElementById('scope-canvas');
-  if (!scopeCanvas) return false;
+  if (!scopeCanvas) {
+    return false;
+  }
   const dpr = window.devicePixelRatio || 1;
   const rect = scopeCanvas.getBoundingClientRect();
   scopeCanvas.width = Math.max(300, rect.width * dpr);
@@ -54,14 +62,18 @@ function initScopeCanvas() {
   scopeCtx = scopeCanvas.getContext('2d');
   scopeCtx.scale(dpr, dpr);
   analyserNode = getAnalyser();
-  if (!analyserNode) return false;
+  if (!analyserNode) {
+    return false;
+  }
   const size = analyserNode.fftSize || 2048;
   scopeData = new Uint8Array(size);
   return true;
 }
 
 function drawScope() {
-  if (!scopeCtx || !analyserNode) return;
+  if (!scopeCtx || !analyserNode) {
+    return;
+  }
   const rect = scopeCanvas.getBoundingClientRect();
   const w = rect.width;
   const h = rect.height;
@@ -80,8 +92,11 @@ function drawScope() {
     const idx = Math.floor(x * step);
     const v = scopeData[idx] / 128.0 - 1.0;
     const y = h / 2 + v * (h / 2) * 0.9;
-    if (x === 0) scopeCtx.moveTo(x, y);
-    else scopeCtx.lineTo(x, y);
+    if (x === 0) {
+      scopeCtx.moveTo(x, y);
+    } else {
+      scopeCtx.lineTo(x, y);
+    }
   }
   scopeCtx.stroke();
 
@@ -89,28 +104,42 @@ function drawScope() {
 }
 
 function startScope() {
-  if (scopeRaf) return;
-  if (!initScopeCanvas()) return;
+  if (scopeRaf) {
+    return;
+  }
+  if (!initScopeCanvas()) {
+    return;
+  }
   drawScope();
 }
 
 function stopScope() {
-  if (scopeRaf) cancelAnimationFrame(scopeRaf);
+  if (scopeRaf) {
+    cancelAnimationFrame(scopeRaf);
+  }
   scopeRaf = null;
 }
 
 function updatePlayhead(playbackStartTimeRef) {
   const playbackStartTime = playbackStartTimeRef();
-  if (playbackStartTime === null) return;
+  if (playbackStartTime === null) {
+    return;
+  }
   const elapsed = audioCtx.currentTime - playbackStartTime;
   const dur = 1 / ((getBpm() / 60) * 4);
-  if (dur <= 0) return;
+  if (dur <= 0) {
+    return;
+  }
   const floatStep = Math.floor(elapsed / dur);
   const uiStep = ((floatStep % STEPS) + STEPS) % STEPS;
-  if (uiStep === lastUiStep) return;
+  if (uiStep === lastUiStep) {
+    return;
+  }
 
   const displayRoot = document.querySelector('.track-display');
-  if (!displayRoot) return;
+  if (!displayRoot) {
+    return;
+  }
 
   if (lastUiStep >= 0) {
     displayRoot
@@ -128,7 +157,9 @@ function renderTrackUI(trackIndex) {
   const track = tracks[trackIndex];
   const display = document.querySelector('.track-display');
   const info = document.getElementById('track-info');
-  if (!display) return;
+  if (!display) {
+    return;
+  }
 
   lastUiStep = -1;
   display.innerHTML = '';
@@ -151,7 +182,9 @@ function renderTrackUI(trackIndex) {
     const btn = document.createElement('button');
     btn.className = 'step';
     btn.dataset.step = String(s);
-    if (track.pattern[s] && track.pattern[s].trig) btn.classList.add('active');
+    if (track.pattern[s]?.trig) {
+      btn.classList.add('active');
+    }
     btn.addEventListener('click', () => {
       track.pattern[s].trig = !track.pattern[s].trig;
       btn.classList.toggle('active', track.pattern[s].trig);
@@ -178,7 +211,9 @@ function renderTrackUI(trackIndex) {
 
 function renderMixer() {
   const mixerRoot = document.getElementById('mixer');
-  if (!mixerRoot) return;
+  if (!mixerRoot) {
+    return;
+  }
   mixerRoot.innerHTML = '';
   const header = document.createElement('div');
   header.className = 'track-info';
@@ -251,10 +286,10 @@ function renderMixer() {
         const enabled = soloActive ? t.solo : !t.muted;
         const effective = v * (enabled ? 1 : 0);
         t.gainNode.gain.linearRampToValueAtTime(effective, now + 0.03);
-      } catch (e) {
+      } catch (_e) {
         try {
           t.gainNode.gain.setValueAtTime(v, now);
-        } catch (e2) {
+        } catch (_e2) {
           // Ignore - AudioContext may be in invalid state
         }
       }
@@ -277,12 +312,13 @@ function renderMixer() {
       const wasSelected = selectedTrack === i;
       if (wasSelected && trackScreen) {
         return; //TO DO: play track
-      } else {
-        if (trackScreen) trackScreen.classList.remove('collapsed');
-        selectedTrack = i;
-        renderTrackUI(selectedTrack);
-        renderFilterUI(selectedTrack);
       }
+      if (trackScreen) {
+        trackScreen.classList.remove('collapsed');
+      }
+      selectedTrack = i;
+      renderTrackUI(selectedTrack);
+      renderFilterUI(selectedTrack);
       updateMixerUI();
     });
 
@@ -295,7 +331,9 @@ function renderMixer() {
 
 function flashChannel(index, ms = 160) {
   const el = document.querySelector(`.mixer-grid .channel[data-track="${index}"]`);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
   // clear existing timeout
   const prev = _flashTimeouts.get(index);
   if (prev) {
@@ -313,7 +351,9 @@ function flashChannel(index, ms = 160) {
 // Render filter controls for the selected track into the right-side filter panel
 function renderFilterUI(trackIndex) {
   const panel = document.getElementById('filter');
-  if (!panel) return;
+  if (!panel) {
+    return;
+  }
   const track = tracks[trackIndex];
   panel.innerHTML = '';
 
@@ -347,7 +387,9 @@ function renderFilterUI(trackIndex) {
     btn.className = 'filter-type-btn';
     btn.type = 'button';
     btn.textContent = label;
-    if (track.filterType === val) btn.classList.add('active');
+    if (track.filterType === val) {
+      btn.classList.add('active');
+    }
     btn.addEventListener('click', () => {
       track.filterType = val;
       typeRow
@@ -386,7 +428,7 @@ function renderFilterUI(trackIndex) {
     const logMin = Math.log10(FREQ_MIN);
     const logMax = Math.log10(FREQ_MAX);
     const t = s / 1000;
-    return Math.pow(10, logMin + t * (logMax - logMin));
+    return 10 ** (logMin + t * (logMax - logMin));
   };
 
   freq.value = String(freqToSlider(track.filterFreq || 2000));
@@ -430,7 +472,7 @@ function renderFilterUI(trackIndex) {
     const logMin = Math.log10(Q_MIN);
     const logMax = Math.log10(Q_MAX);
     const t = s / 1000;
-    return Math.pow(10, logMin + t * (logMax - logMin));
+    return 10 ** (logMin + t * (logMax - logMin));
   };
 
   q.value = String(qToSlider(track.filterQ || 1));
@@ -449,14 +491,20 @@ function renderFilterUI(trackIndex) {
 
 function updateMixerUI() {
   const grid = document.querySelector('.mixer-grid');
-  if (!grid) return;
+  if (!grid) {
+    return;
+  }
   grid.querySelectorAll('.channel').forEach((el) => {
     const idx = Number(el.dataset.track);
     const track = tracks[idx];
     const muteBtn = el.querySelector('.mute');
     const soloBtn = el.querySelector('.solo');
-    if (muteBtn) muteBtn.classList.toggle('active', !!track.muted);
-    if (soloBtn) soloBtn.classList.toggle('active', !!track.solo);
+    if (muteBtn) {
+      muteBtn.classList.toggle('active', !!track.muted);
+    }
+    if (soloBtn) {
+      soloBtn.classList.toggle('active', !!track.solo);
+    }
     const faderEl = el.querySelector('.fader-wrap input');
     if (faderEl) {
       const val =
@@ -467,7 +515,7 @@ function updateMixerUI() {
   });
 }
 
-function init(playbackStartTimeRefGetter) {
+function init(_playbackStartTimeRefGetter) {
   // Build UI shell
   const tracksContainer = document.querySelector('.tracks');
   if (tracksContainer) {
@@ -519,9 +567,13 @@ function init(playbackStartTimeRefGetter) {
       }
 
       const k = e.key;
-      if (!/^[1-9]$/.test(k)) return;
+      if (!/^[1-9]$/.test(k)) {
+        return;
+      }
       const idx = Number(k) - 1;
-      if (idx < 0 || idx >= TRACK_COUNT) return;
+      if (idx < 0 || idx >= TRACK_COUNT) {
+        return;
+      }
 
       const trackScreen = document.querySelector('.track-screen');
       if (selectedTrack === idx) {
@@ -529,7 +581,9 @@ function init(playbackStartTimeRefGetter) {
           return; //TO DO: play track
         }
       } else {
-        if (trackScreen) trackScreen.classList.remove('collapsed');
+        if (trackScreen) {
+          trackScreen.classList.remove('collapsed');
+        }
         selectedTrack = idx;
         renderTrackUI(selectedTrack);
         renderFilterUI(selectedTrack);

@@ -38,10 +38,12 @@ Bundles with esbuild into `dist/`, minifies code, strips live-reload script from
 
 ### Linting and Formatting
 ```cmd
-npm run lint        # Run eslint with auto-fix
-npm run lint:ci     # Run eslint without fixes (for CI)
-npm run format      # Format all files with Prettier
+npm run lint        # Run Biome linter with auto-fix
+npm run lint:ci     # Run Biome linter without fixes (for CI)
+npm run format      # Format all files with Biome
 npm run format:check # Check formatting without changes
+npm run check       # Run both linting and formatting with auto-fix
+npm run check:ci    # Run both linting and formatting without fixes
 ```
 
 ### Code Quality
@@ -54,7 +56,7 @@ sonar-scanner
 - All magic numbers are extracted to constants in `src/config/constants.js`
 - Security: innerHTML usage minimized; dynamic content uses textContent
 - Empty catch blocks include explanatory comments
-- ESLint rules enforced for consistency
+- Biome rules enforced for consistency (linting and formatting)
 
 ### Troubleshooting Port Conflicts (Windows)
 If `EADDRINUSE` error occurs on port 3000:
@@ -169,7 +171,7 @@ The `track-trigger` event includes the scheduled audio `time` (AudioContext time
 - Keep audio logic in `src/engine/*` and DOM/UI logic in `src/ui/*`
 - Centralize constants in `src/config/constants.js`
 - Use descriptive filenames for canonical modules; keep `index.js` shims only for compatibility
-- Follow ESLint rules: prefer `const`, use `===`, enable multi-line curly braces
+- Follow Biome rules: prefer `const`, use `===`, enable multi-line curly braces
 - No console warnings in production builds (but `console.log` is allowed)
 
 ## Common Issues

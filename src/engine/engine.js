@@ -1,18 +1,18 @@
 // Application-level config (shared constants)
 import {
   DEFAULT_BPM,
-  STEPS,
-  TRACK_COUNT,
-  FFT_SIZE,
-  LOOKAHEAD,
-  STEPS_PER_BEAT,
   DEFAULT_FILTER_FREQ,
   DEFAULT_VOLUME,
+  FFT_SIZE,
+  LOOKAHEAD,
+  OSC_ATTACK_TIME,
   OSC_BASE_FREQ,
   OSC_FREQ_STEP,
-  OSC_ATTACK_TIME,
   OSC_RELEASE_TIME,
   OSC_TOTAL_DURATION,
+  STEPS,
+  STEPS_PER_BEAT,
+  TRACK_COUNT,
 } from '../config/constants.js';
 
 // Audio engine: audio context, Track, scheduling, and helper APIs
@@ -58,7 +58,9 @@ class Track {
   async load() {
     try {
       const res = await fetch(this.sampleUrl);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       const buf = await res.arrayBuffer();
       this.buffer = await this.context.decodeAudioData(buf);
     } catch (err) {
@@ -83,7 +85,9 @@ class Track {
       const filter = this.context.createBiquadFilter();
       filter.type = merged.filterType || 'lowpass';
       filter.frequency.value = merged.filterFreq;
-      if (typeof merged.filterQ === 'number') filter.Q.value = merged.filterQ;
+      if (typeof merged.filterQ === 'number') {
+        filter.Q.value = merged.filterQ;
+      }
 
       const env = this.context.createGain();
       env.gain.setValueAtTime(0, time);
@@ -105,7 +109,9 @@ class Track {
       filter.type = merged.filterType || 'lowpass';
       filter.frequency.setValueAtTime(merged.filterFreq, time);
       try {
-        if (typeof merged.filterQ === 'number') filter.Q.setValueAtTime(merged.filterQ, time);
+        if (typeof merged.filterQ === 'number') {
+          filter.Q.setValueAtTime(merged.filterQ, time);
+        }
       } catch (e) {
         console.warn(`Filter Q setting failed: ${e.message}`);
       }
@@ -143,7 +149,9 @@ let tracks = [];
 function scheduleStep(stepIndex, time) {
   tracks.forEach((track) => {
     const step = track.pattern[stepIndex];
-    if (!step?.trig) return;
+    if (!step?.trig) {
+      return;
+    }
 
     // notify UI that this track will trigger (UI can use this to flash mixers etc.)
     try {
@@ -163,7 +171,9 @@ function scheduleStep(stepIndex, time) {
 }
 
 function scheduler() {
-  if (!isPlaying) return;
+  if (!isPlaying) {
+    return;
+  }
 
   const now = audioCtx.currentTime;
   while (nextEventTime < now + lookahead) {
@@ -218,7 +228,9 @@ function getAnalyser() {
 
 function setTrackLevel(index, value, ramp = 0.03) {
   const t = tracks[index];
-  if (!t) return;
+  if (!t) {
+    return;
+  }
   const now = audioCtx.currentTime;
   try {
     t.gainNode.gain.cancelScheduledValues(now);
@@ -228,10 +240,10 @@ function setTrackLevel(index, value, ramp = 0.03) {
       value * (t.muted || t.solo ? (t.solo ? 1 : 0) : 1),
       now + ramp
     );
-  } catch (e) {
+  } catch (_e) {
     try {
       t.gainNode.gain.setValueAtTime(value, now);
-    } catch (e2) {
+    } catch (_e2) {
       // ignore
     }
   }
