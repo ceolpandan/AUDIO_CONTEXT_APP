@@ -37,10 +37,7 @@
   color: #fff;
   box-shadow: var(--shadow-strong);
   cursor: pointer;
-  transition:
-    transform 0.08s,
-    box-shadow 0.08s,
-    filter 0.12s;
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.12s;
 }
 .top-bar button:active {
   transform: translateY(1px);
@@ -60,7 +57,7 @@
   letter-spacing: 0.08em;
   color: var(--muted);
 }
-.top-bar label input[type='range'] {
+.top-bar label input[type="range"] {
   width: 150px;
 }
 
@@ -122,7 +119,7 @@
   overflow: hidden;
 }
 .track::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at top right, rgba(10, 160, 111, 0.3) 0, transparent 55%);
@@ -210,16 +207,13 @@
   background: #333;
   cursor: pointer;
   box-shadow: inset 0 0 0 1px #444;
-  transition:
-    background 0.12s,
-    transform 0.06s,
-    box-shadow 0.1s;
+  transition: background 0.12s, transform 0.06s, box-shadow 0.1s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 .track .steps .step::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0.15rem;
   border-radius: inherit;
@@ -227,15 +221,11 @@
 }
 .track .steps .step:active {
   transform: translateY(1px);
-  box-shadow:
-    inset 0 0 0 1px #444,
-    0 1px 2px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 0 1px #444, 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 .track .steps .step.active {
   background: var(--track-accent, var(--accent));
-  box-shadow:
-    0 0 14px rgba(10, 160, 111, 0.9),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 14px rgba(10, 160, 111, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 .track .steps .step.active::after {
   border-color: rgba(255, 255, 255, 0.2);
@@ -371,9 +361,7 @@
 .filter-type-btn.active {
   background: var(--accent);
   color: #fff;
-  box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.45),
-    0 0 14px rgba(10, 160, 111, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(10, 160, 111, 0.08);
 }
 .filter-row {
   display: grid;
@@ -390,7 +378,7 @@
 }
 
 .filter-value {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 0.75rem;
   color: var(--accent);
   font-weight: 600;
@@ -402,7 +390,7 @@
   width: 100%;
 }
 .filter-panel select,
-.filter-panel input[type='range'] {
+.filter-panel input[type="range"] {
   width: 100%;
 }
 .filter-note {
@@ -419,10 +407,7 @@
   align-items: stretch;
   gap: 0.5rem;
   cursor: pointer;
-  transition:
-    transform 0.08s,
-    box-shadow 0.12s,
-    border-color 0.12s;
+  transition: transform 0.08s, box-shadow 0.12s, border-color 0.12s;
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 .channel:hover {
@@ -463,27 +448,21 @@
   align-items: center;
   gap: 0.5rem;
 }
-.fader-wrap input[type='range'] {
+.fader-wrap input[type="range"] {
   width: 100%;
 }
 
 .channel.active {
   border-color: var(--channel-accent, var(--accent));
-  box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.45),
-    0 0 14px rgba(10, 160, 111, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(10, 160, 111, 0.08);
 }
 
 /* Flash when a track triggers */
 .channel.channel--hit {
   position: relative;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  box-shadow:
-    0 10px 30px rgba(240, 240, 240, 0.5) inset,
-    0 6px 18px rgba(0, 0, 0, 0.45);
-  transition:
-    background 160ms ease,
-    box-shadow 160ms ease;
+  box-shadow: 0 10px 30px rgba(240, 240, 240, 0.5) inset, 0 6px 18px rgba(0, 0, 0, 0.45);
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
 
 /* Collapsed sequencer: hides the track-screen visually but keeps layout stable */
@@ -491,7 +470,5 @@
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition:
-    max-height 220ms ease,
-    opacity 180ms linear;
+  transition: max-height 220ms ease, opacity 180ms linear;
 }
