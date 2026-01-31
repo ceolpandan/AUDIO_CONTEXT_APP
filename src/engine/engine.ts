@@ -1,25 +1,7 @@
 // Application-level config (shared constants)
-import {
-    DEFAULT_BPM,
-    DEFAULT_FILTER_FREQ,
-    DEFAULT_VOLUME,
-    FFT_SIZE,
-    LOOKAHEAD,
-    OSC_ATTACK_TIME,
-    OSC_BASE_FREQ,
-    OSC_FREQ_STEP,
-    OSC_RELEASE_TIME,
-    OSC_TOTAL_DURATION,
-    STEPS,
-    STEPS_PER_BEAT,
-    TRACK_COUNT,
-} from '../config/constants.ts';
-import type {
-    FilterType,
-    PatternStep,
-    TrackTriggerEventDetail,
-    TriggerParams,
-} from '../types/index.ts';
+import { DEFAULT_BPM, FFT_SIZE, LOOKAHEAD, STEPS, STEPS_PER_BEAT } from '../config/constants.ts';
+import type { TrackTriggerEventDetail } from '../types/index.ts';
+import { Track } from './Track.ts';
 
 // Audio engine: audio context, Track, scheduling, and helper APIs
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -33,126 +15,6 @@ const analyser: AnalyserNode = audioCtx.createAnalyser();
 analyser.fftSize = FFT_SIZE;
 masterGain.connect(analyser);
 analyser.connect(audioCtx.destination);
-
-class Track {
-    readonly context: AudioContext;
-    readonly sampleUrl: string;
-    readonly index: number;
-    buffer: AudioBuffer | null;
-    pattern: PatternStep[];
-    volume: number;
-    filterFreq: number;
-    filterType: FilterType;
-    filterQ: number;
-    gainNode: GainNode;
-    level: number;
-    muted: boolean;
-    solo: boolean;
-
-    constructor(context: AudioContext, sampleUrl: string, index = 0) {
-        this.context = context;
-        this.sampleUrl = sampleUrl;
-        this.index = index;
-        this.buffer = null;
-
-        this.pattern = new Array<PatternStep>(STEPS)
-            .fill(null as unknown as PatternStep)
-            .map(() => ({
-                trig: false,
-                locks: {},
-            }));
-
-        this.volume = DEFAULT_VOLUME;
-        this.filterFreq = DEFAULT_FILTER_FREQ;
-        // filter type and resonance (Q)
-        this.filterType = 'lowpass';
-        this.filterQ = 1;
-
-        this.gainNode = context.createGain();
-        // route track outputs into the master bus
-        this.gainNode.connect(masterGain);
-        // Channel fader level (0..1) — separate from per-hit envelope volume
-        this.level = 1;
-        this.gainNode.gain.setValueAtTime(this.level, this.context.currentTime);
-        this.muted = false;
-        this.solo = false;
-    }
-
-    async load(): Promise<void> {
-        try {
-            const res = await fetch(this.sampleUrl);
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
-            const buf = await res.arrayBuffer();
-            this.buffer = await this.context.decodeAudioData(buf);
-        } catch (err) {
-            console.warn(`Could not load sample "${this.sampleUrl}":`, err);
-            this.buffer = null;
-        }
-    }
-
-    trigger(time: number, params: TriggerParams = {}): void {
-        const merged = {
-            volume: params.volume ?? this.volume,
-            filterFreq: params.filterFreq ?? this.filterFreq,
-            filterType: params.filterType ?? this.filterType,
-            filterQ: params.filterQ ?? this.filterQ,
-        };
-
-        if (this.buffer) {
-            const src: AudioBufferSourceNode = this.context.createBufferSource();
-            src.buffer = this.buffer;
-
-            const filter: BiquadFilterNode = this.context.createBiquadFilter();
-            filter.type = merged.filterType || 'lowpass';
-            filter.frequency.value = merged.filterFreq;
-            if (typeof merged.filterQ === 'number') {
-                filter.Q.value = merged.filterQ;
-            }
-
-            const env: GainNode = this.context.createGain();
-            env.gain.setValueAtTime(0, time);
-            env.gain.linearRampToValueAtTime(merged.volume, time + 0.005);
-
-            src.connect(filter);
-            filter.connect(env);
-            env.connect(this.gainNode);
-
-            src.start(time);
-        } else {
-            // Oscillator fallback
-            const osc: OscillatorNode = this.context.createOscillator();
-            const baseFreq = OSC_BASE_FREQ + (this.index % TRACK_COUNT) * OSC_FREQ_STEP;
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(baseFreq, time);
-
-            const filter: BiquadFilterNode = this.context.createBiquadFilter();
-            filter.type = merged.filterType || 'lowpass';
-            filter.frequency.setValueAtTime(merged.filterFreq, time);
-            try {
-                if (typeof merged.filterQ === 'number') {
-                    filter.Q.setValueAtTime(merged.filterQ, time);
-                }
-            } catch (e) {
-                const error = e as Error;
-                console.warn(`Filter Q setting failed: ${error.message}`);
-            }
-
-            const env: GainNode = this.context.createGain();
-            env.gain.setValueAtTime(0, time);
-            env.gain.linearRampToValueAtTime(merged.volume, time + OSC_ATTACK_TIME);
-            env.gain.linearRampToValueAtTime(0, time + OSC_RELEASE_TIME);
-
-            osc.connect(filter);
-            filter.connect(env);
-            env.connect(this.gainNode);
-
-            osc.start(time);
-            osc.stop(time + OSC_TOTAL_DURATION);
-        }
-    }
-}
 
 // Sequencer state
 let bpm: number = DEFAULT_BPM;
@@ -170,12 +32,11 @@ const lookahead: number = LOOKAHEAD;
 let tracks: Track[] = [];
 
 function scheduleStep(stepIndex: number, time: number): void {
-    tracks.forEach((track) => {
+    for (const track of tracks) {
         const step = track.pattern[stepIndex];
         if (!step?.trig) {
             return;
         }
-
         // notify UI that this track will trigger (UI can use this to flash mixers etc.)
         try {
             if (typeof document !== 'undefined') {
@@ -192,7 +53,7 @@ function scheduleStep(stepIndex: number, time: number): void {
         }
 
         track.trigger(time, step.locks);
-    });
+    }
 }
 
 function scheduler(): void {
@@ -225,7 +86,7 @@ function stop(): void {
 }
 
 async function createTracksFromUrls(urls: string[]): Promise<Track[]> {
-    tracks = urls.map((url, i) => new Track(audioCtx, url, i));
+    tracks = urls.map((url, i) => new Track(audioCtx, url, masterGain, i));
     await Promise.all(tracks.map((t) => t.load()));
     return tracks;
 }
@@ -234,18 +95,18 @@ async function createTracksFromUrls(urls: string[]): Promise<Track[]> {
 function updateMixerGains(): void {
     const soloActive = tracks.some((t) => t.solo);
     const now = audioCtx.currentTime;
-    tracks.forEach((t) => {
-        const enabled = soloActive ? t.solo : !t.muted;
+    for (const track of tracks) {
+        const enabled = soloActive ? track.solo : !track.muted;
         const val = enabled ? 1 : 0;
         try {
-            t.gainNode.gain.cancelScheduledValues(now);
+            track.gainNode.gain.cancelScheduledValues(now);
             // multiply channel level by mute/solo state
-            t.gainNode.gain.setValueAtTime(t.level * val, now);
+            track.gainNode.gain.setValueAtTime(track.level * val, now);
         } catch (e) {
             const error = e as Error;
             console.log(`Exception while doing something: ${error.message}`);
         }
-    });
+    }
 }
 
 function getAnalyser(): AnalyserNode {
@@ -286,9 +147,6 @@ function getBpm(): number {
 
 export {
     audioCtx,
-    Track,
-    STEPS,
-    TRACK_COUNT,
     stepDuration,
     start,
     stop,

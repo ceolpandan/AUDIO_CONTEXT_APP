@@ -44,9 +44,9 @@ function stopUI(): void {
         cancelAnimationFrame(uiRaf);
     }
     uiRaf = null;
-    document
-        .querySelectorAll('.step--playhead')
-        .forEach((el) => el.classList.remove('step--playhead'));
+    for (const element of document.querySelectorAll('.step--playhead')) {
+        element.classList.remove('step--playhead');
+    }
     lastUiStep = -1;
     stopScope();
 }
@@ -145,14 +145,14 @@ function updatePlayhead(playbackStartTimeRef: PlaybackStartTimeGetter): void {
     }
 
     if (lastUiStep >= 0) {
-        displayRoot
-            .querySelectorAll(`.step[data-step="${lastUiStep}"]`)
-            .forEach((el) => el.classList.remove('step--playhead'));
+        for (const el of displayRoot.querySelectorAll(`.step[data-step="${lastUiStep}"]`)) {
+            el.classList.remove('step--playhead');
+        }
     }
 
-    displayRoot
-        .querySelectorAll(`.step[data-step="${uiStep}"]`)
-        .forEach((el) => el.classList.add('step--playhead'));
+    for (const el of displayRoot.querySelectorAll(`.step[data-step="${uiStep}"]`)) {
+        el.classList.add('step--playhead');
+    }
     lastUiStep = uiStep;
 }
 
@@ -226,7 +226,7 @@ function renderMixer(): void {
     const grid = document.createElement('div');
     grid.className = 'mixer-grid';
 
-    tracks.forEach((t, i) => {
+    for (const [i, t] of tracks.entries()) {
         const ch = document.createElement('div');
         ch.className = 'channel';
         ch.dataset.track = String(i);
@@ -327,7 +327,7 @@ function renderMixer(): void {
         });
 
         grid.appendChild(ch);
-    });
+    }
 
     mixerRoot.appendChild(grid);
     updateMixerUI();
@@ -386,7 +386,7 @@ function renderFilterUI(trackIndex: number): void {
     ];
     const typeRow = document.createElement('div');
     typeRow.className = 'filter-type-row';
-    types.forEach(([val, label]) => {
+    for (const [val, label] of types) {
         const btn = document.createElement('button');
         btn.className = 'filter-type-btn';
         btn.type = 'button';
@@ -396,12 +396,12 @@ function renderFilterUI(trackIndex: number): void {
         }
         btn.addEventListener('click', () => {
             track.filterType = val as BiquadFilterType;
-            typeRow
-                .querySelectorAll('.filter-type-btn')
-                .forEach((b) => b.classList.toggle('active', b === btn));
+            for (const b of typeRow.querySelectorAll('.filter-type-btn')) {
+                b.classList.toggle('active', b === btn);
+            }
         });
         typeRow.appendChild(btn);
-    });
+    }
     panel.appendChild(typeRow);
 
     // Frequency slider
@@ -498,7 +498,7 @@ function updateMixerUI(): void {
     if (!grid) {
         return;
     }
-    grid.querySelectorAll('.channel').forEach((el) => {
+    for (const el of grid.querySelectorAll('.channel')) {
         const htmlEl = el as HTMLElement;
         const idx = Number(htmlEl.dataset.track);
         const track = tracks[idx];
@@ -517,7 +517,7 @@ function updateMixerUI(): void {
             faderEl.value = String(val);
         }
         el.classList.toggle('active', idx === selectedTrack);
-    });
+    }
 }
 
 function init(_playbackStartTimeRefGetter: PlaybackStartTimeGetter): void {
