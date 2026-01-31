@@ -5,7 +5,10 @@
       "Bash(npm install)",
       "Bash(npm run check:ci:*)",
       "Bash(npm run check:*)",
-      "Bash(npx biome check:*)"
+      "Bash(npx biome check:*)",
+      "Bash(dir /s /b \"C:\\Users\\stilo\\AUDIO_CONTEXT_APP\")",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
