@@ -8,7 +8,7 @@ import {
     OSC_TOTAL_DURATION,
     STEPS,
     TRACK_COUNT,
-} from '../config/constants';
+} from '../config/constants.ts';
 import type { FilterType, PatternStep, TriggerParams } from '../types';
 
 export class Track {
