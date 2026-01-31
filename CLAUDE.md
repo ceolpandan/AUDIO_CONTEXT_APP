@@ -172,7 +172,7 @@ Digitick/
 
 1. Place audio files in `samples/` directory (e.g., `samples/kick1.wav`)
 2. Update `app.ts` sample URLs in `createTracksFromUrls(sampleUrls)`
-3. Set pattern triggers: `tracks[i].pattern[stepIndex].trig = true`
+3. Set pattern triggers: `tracks[i].sequence[stepIndex].trig = true`
 4. Adjust track volumes/filters after track creation
 
 ### Adding UI Components

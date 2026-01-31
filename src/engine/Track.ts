@@ -9,14 +9,14 @@ import {
     STEPS,
     TRACK_COUNT,
 } from '../config/constants.ts';
-import type { FilterType, PatternStep, TriggerParams } from '../types';
+import type { FilterType, SequenceStep, TriggerParams } from '../types';
 
 export class Track {
     readonly context: AudioContext;
     readonly sampleUrl: string;
     readonly index: number;
     buffer: AudioBuffer | null;
-    pattern: PatternStep[];
+    sequence: SequenceStep[];
     volume: number;
     filterFreq: number;
     filterType: FilterType;
@@ -32,27 +32,11 @@ export class Track {
         this.index = index;
         this.buffer = null;
 
-        this.pattern = new Array<PatternStep>(STEPS)
-            .fill(null as unknown as PatternStep)
-            .map(() => ({
-                trig: false,
-                locks: {},
-            }));
-
-        this.volume = DEFAULT_VOLUME;
-        this.filterFreq = DEFAULT_FILTER_FREQ;
-        // filter type and resonance (Q)
-        this.filterType = 'lowpass';
-        this.filterQ = 1;
+        this.setInitSequence();
+        this.setInitParams();
 
         this.gainNode = context.createGain();
-        // route track outputs into the master bus
         this.gainNode.connect(masterGain);
-        // Channel fader level (0..1) — separate from per-hit envelope volume
-        this.level = 1;
-        this.gainNode.gain.setValueAtTime(this.level, this.context.currentTime);
-        this.muted = false;
-        this.solo = false;
     }
 
     async load(): Promise<void> {
@@ -128,5 +112,25 @@ export class Track {
             osc.start(time);
             osc.stop(time + OSC_TOTAL_DURATION);
         }
+    }
+
+    private setInitSequence(): void {
+        this.sequence = new Array<SequenceStep>(STEPS)
+            .fill(null as unknown as SequenceStep)
+            .map(() => ({
+                trig: false,
+                locks: {},
+            }));
+    }
+
+    private setInitParams(): void {
+        this.volume = DEFAULT_VOLUME;
+        this.filterFreq = DEFAULT_FILTER_FREQ;
+        this.filterType = 'lowpass';
+        this.filterQ = 1;
+
+        this.level = 1;
+        this.muted = false;
+        this.solo = false;
     }
 }

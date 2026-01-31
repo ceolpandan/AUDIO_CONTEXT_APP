@@ -90,7 +90,7 @@ The project started from a desire to recreate the beloved Elektron Digitakt drum
 **How to Add Samples and Presets**
 
 - Place audio files under the `samples/` directory (e.g., `samples/kick1.wav`).
-- `app.js` currently contains a hiphop default preset that calls `createTracksFromUrls(sampleUrls)` and then sets triggers on `tracks[i].pattern[...]`.
+- `app.js` currently contains a hiphop default preset that calls `createTracksFromUrls(sampleUrls)` and then sets triggers on `tracks[i].sequence[...]`.
 - To add more presets, create a `presets/` file or add functions in `app.js` returning pattern arrays.
 
 **Development Notes**

@@ -25,7 +25,7 @@ Low-level documentation of how triggers are dispatched and sound is output.
 │                           scheduleStep(stepIndex, time)                          │
 │  ┌─────────────────────────────────────────────────────────────────────────┐    │
 │  │  for (const track of tracks) {                                          │    │
-│  │      if (!track.pattern[stepIndex].trig) return; ◄── BUG! should be     │    │
+│  │      if (!track.sequence[stepIndex].trig) return; ◄── BUG! should be     │    │
 │  │                                                       "continue"         │    │
 │  │      ┌──────────────────────────────────────────────────────────────┐   │    │
 │  │      │  1. DISPATCH UI EVENT                                         │   │    │
@@ -174,7 +174,7 @@ Low-level documentation of how triggers are dispatched and sound is output.
 ```typescript
 function scheduleStep(stepIndex: number, time: number): void {
     for (const track of tracks) {
-        const step = track.pattern[stepIndex];
+        const step = track.sequence[stepIndex];
         if (!step?.trig) {
             return;    // ← BUG: should be "continue"
         }

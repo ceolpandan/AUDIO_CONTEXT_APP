@@ -27,7 +27,7 @@ export interface ParameterLocks {
 /**
  * A single step in the pattern sequencer
  */
-export interface PatternStep {
+export interface SequenceStep {
     trig: boolean;
     locks: ParameterLocks;
 }

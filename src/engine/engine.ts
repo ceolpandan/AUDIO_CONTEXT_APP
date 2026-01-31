@@ -33,7 +33,7 @@ let tracks: Track[] = [];
 
 function scheduleStep(stepIndex: number, time: number): void {
     for (const track of tracks) {
-        const step = track.pattern[stepIndex];
+        const step = track.sequence[stepIndex];
         if (!step?.trig) {
             continue;
         }
@@ -145,13 +145,17 @@ function getBpm(): number {
     return bpm;
 }
 
+function getTracks(): Track[] {
+    return tracks;
+}
+
 export {
     audioCtx,
     stepDuration,
     start,
     stop,
     createTracksFromUrls,
-    tracks,
+    getTracks,
     updateMixerGains,
     setTrackLevel,
     setBpm,

@@ -1,5 +1,5 @@
 import { STEPS, TRACK_COUNT } from '../config/constants.ts';
-import { audioCtx, getAnalyser, getBpm, setBpm, tracks, updateMixerGains } from '../engine.ts';
+import { audioCtx, getAnalyser, getBpm, getTracks, setBpm, updateMixerGains } from '../engine.ts';
 import type { PlaybackStartTimeGetter, TrackTriggerEvent } from '../types/index.ts';
 
 let uiRaf: number | null = null;
@@ -157,7 +157,7 @@ function updatePlayhead(playbackStartTimeRef: PlaybackStartTimeGetter): void {
 }
 
 function renderTrackUI(trackIndex: number): void {
-    const track = tracks[trackIndex];
+    const track = getTracks()[trackIndex];
     const display = document.querySelector('.track-display');
     const info = document.getElementById('track-info');
     if (!display) {
@@ -185,12 +185,12 @@ function renderTrackUI(trackIndex: number): void {
         const btn = document.createElement('button');
         btn.className = 'step';
         btn.dataset.step = String(s);
-        if (track.pattern[s]?.trig) {
+        if (track.sequence[s]?.trig) {
             btn.classList.add('active');
         }
         btn.addEventListener('click', () => {
-            track.pattern[s].trig = !track.pattern[s].trig;
-            btn.classList.toggle('active', track.pattern[s].trig);
+            track.sequence[s].trig = !track.sequence[s].trig;
+            btn.classList.toggle('active', track.sequence[s].trig);
         });
         stepsWrap.appendChild(btn);
     }
@@ -226,7 +226,7 @@ function renderMixer(): void {
     const grid = document.createElement('div');
     grid.className = 'mixer-grid';
 
-    for (const [i, t] of tracks.entries()) {
+    for (const [i, t] of getTracks().entries()) {
         const ch = document.createElement('div');
         ch.className = 'channel';
         ch.dataset.track = String(i);
@@ -285,7 +285,7 @@ function renderMixer(): void {
             try {
                 t.gainNode.gain.cancelScheduledValues(now);
                 t.gainNode.gain.setValueAtTime(t.gainNode.gain.value, now);
-                const soloActive = tracks.some((x) => x.solo);
+                const soloActive = getTracks().some((x) => x.solo);
                 const enabled = soloActive ? t.solo : !t.muted;
                 const effective = v * (enabled ? 1 : 0);
                 t.gainNode.gain.linearRampToValueAtTime(effective, now + 0.03);
@@ -358,7 +358,7 @@ function renderFilterUI(trackIndex: number): void {
     if (!panel) {
         return;
     }
-    const track = tracks[trackIndex];
+    const track = getTracks()[trackIndex];
     panel.innerHTML = '';
 
     const FREQ_MIN = 20;
@@ -501,7 +501,7 @@ function updateMixerUI(): void {
     for (const el of grid.querySelectorAll('.channel')) {
         const htmlEl = el as HTMLElement;
         const idx = Number(htmlEl.dataset.track);
-        const track = tracks[idx];
+        const track = getTracks()[idx];
         const muteBtn = el.querySelector('.mute');
         const soloBtn = el.querySelector('.solo');
         if (muteBtn) {
