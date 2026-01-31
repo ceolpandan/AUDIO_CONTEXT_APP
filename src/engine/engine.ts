@@ -35,7 +35,7 @@ function scheduleStep(stepIndex: number, time: number): void {
     for (const track of tracks) {
         const step = track.pattern[stepIndex];
         if (!step?.trig) {
-            return;
+            continue;
         }
         // notify UI that this track will trigger (UI can use this to flash mixers etc.)
         try {
